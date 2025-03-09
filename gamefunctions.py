@@ -9,7 +9,7 @@ these functions comprise what is required to create an adventure game.
 """
 #gamefunctions.py
 #Tucker Werhane
-#March 7th, 2025
+#March 8th, 2025
 #This programs tests four functions, purchase_item, new_random_monster, print_welcome, and print_shop_menu.
 #These functions can be called upon anywhere within the script to execute their predetrmined actions.
 
@@ -117,6 +117,7 @@ def new_random_monster():
     monster_list = [monster_one, monster_two, monster_three, monster_four, monster_five, monster_six]
     #returns monster based on postion in list and previously generate random integer
     return monster_list[monster_number]
+#a function that a Prints welcome sign 
 def print_welcome(name, width = 20):
     """
     Creates a Welcome message.
@@ -137,8 +138,10 @@ def print_welcome(name, width = 20):
         >>>print_welcome('Frank')
             Hello, Frank!    
     """
+    #Combines name with welcome string
     welcome_string = 'Hello, ' + name + '!'
     print (f'{welcome_string :^{width}}')
+#a function that prints a shop menu
 def print_shop_menu(item1Name, item1Price, item2Name, item2Price):
     """
     Prints a shop menu given two items and their prices.
@@ -162,14 +165,292 @@ def print_shop_menu(item1Name, item1Price, item2Name, item2Price):
         | Heal Potion   $78.00 |
         \----------------------/
     """
+    #formats item lisitngs
     item1Price = (f'{float(item1Price):.2f}')
     item2Price = (f'{float(item2Price):.2f}')
+    #formats maneu design
     top_string = '/' + ('-' * 22) +'\\'
     bottom_string = '\\' + ('-' * 22) +'/'
+    #prints menu
     print (top_string)
     print(f'| {item1Name:<12}{('$' + item1Price):>8} |')
     print(f'| {item2Name:<12}{('$' + item2Price):>8} |')
     print (bottom_string)
+#main game menu
+def town_menu(hp, gold):
+    """
+    Prints a initial menu for actions to be taken within the game.
+    
+    Parameters:
+        hp (int): The amount of health the player currently has.
+        gold (float): The current amount of gold the player has.
+    Returns:
+        user_choice: A value of 1, 2, or 3 that corresponds to a specific action set.
+    
+    Prints:
+        Town menu: prints a list of possible actions taken
+    
+    Examples:
+        >>>print(town_menu(45, 62))
+        You are in town.
+        Current HP: 45, Current Gold: 62
+        What would you like to do?
+        1) Leave town (Fight Monster)
+        2) Sleep (Restore HP for 15 Gold)
+        3) Quit
+    """
+    #Prints options and welcome
+    print ('You are in town.')
+    print (f'Current HP: {hp}, Current Gold: {gold}')
+    user_choice = input('What would you like to do?\n\n'
+                        '1) Leave town (Fight Monster)\n'
+                        '2) Sleep (Restore HP for 10 Gold)\n'
+                        '3) Quit\n')
+    #validates users choice
+    user_choice = validate_answer3(user_choice)
+    return user_choice
+# Displays current fight statistics    
+def displayFightStatistics(user_hp, monster_hp, monster_name = 'Monster'):
+    """
+    Displays current health of player and monster being fought.
+    
+    Parameters:
+        user_hp (int): Current health level of player.
+        monster_hp (int): Current health of monster.
+        monster_name (str): Name of monster being fought. [Defaults to Monster]
+    Returns:
+        None
+    Prints:
+        Fight_statistics: Displays current health of player and monster.
+    Examples:
+        >>>displayFightStatistics(48, 153, Dragon)
+        Your health is currently 48 HP.
+        The Dragon is at 153 HP.  
+    """
+    #prints statistics
+    print(f'Your health is currently {user_hp} HP.\nThe {monster_name} is at {monster_hp} HP.')
+#Function that prints menu of fight options
+def getUserFightOptions(user_hp, gold, monster_hp, monster_name):
+    """
+    Menu and selection for options in a fight.
+    
+    Parameters:
+        user_hp (int): Current health of the user.
+        gold (float): Current gold balance of the player.
+        monster_hp (int): The health of the monster.
+        monster_name (str): The monsters name.
+    Returns:
+        user_choice: a value of 1, 2, or 3 pertaining to the users chocie in the menu.
+    Examples:
+        >>>print(getUserFightOptions(50, 17, 42, 'Goblin'))
+        Your health is currently 50 HP.
+        The Goblin is at 42 HP.
+        (Current Gold: 17) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 1 Gold)
+        >>>1
+        1
+    """
+    displayFightStatistics(user_hp, monster_hp, monster_name)
+    print (f'(Current Gold: {gold}) \nHow would you like to continue?')
+    #Determines players move choice for the fight
+    user_choice = input('1) Primary Attack (5-37 damage)\n'
+                        '2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)\n'
+                        '3) Leave fight (Lose 10 Gold)\n')
+    user_choice = validate_answer3(user_choice)
+    return user_choice
+#Fight Sequence Function
+def monster_fight(hp, gold):
+    """
+    Conducts a fight sequence against a monster.
+    
+    Parameters:
+        hp (int): Current health of player.
+        gold (float): Current money held by the player
+    Returns: hp, gold
+        hp (int): remaining player health after battle.
+        gold (float) remaing gold held by player after battle.
+    Examples:
+        >>>print (monster_fight(400, 17))
+        You are fighting An Elf.
+        This monster has 120 HP and 95 power.
+
+        Your health is currently 400 HP.
+        The An Elf is at 120 HP.
+        (Current Gold: 17) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>2
+        5 Gold spent on Shield Potion
+        The monster did 10 damage, your shield repeled the damage,as a result the monster lost 5.0 HP leaving it at 115.0 HP
+
+        Your health is currently 400 HP.
+        The An Elf is at 115.0 HP.
+        (Current Gold: 12) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>1
+        Your attack yields 25 damage
+        The monster has 90.0 HP remaining
+        The monster did 91 damage, leaving you with 309 HP
+
+        Your health is currently 309 HP.
+        The An Elf is at 90.0 HP.
+        (Current Gold: 12) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>1
+        Your attack yields 19 damage
+        The monster has 71.0 HP remaining
+        The monster did 40 damage, leaving you with 269 HP
+
+        Your health is currently 269 HP.
+        The An Elf is at 71.0 HP.
+        (Current Gold: 12) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>1
+        Your attack yields 6 damage
+        The monster has 65.0 HP remaining
+        The monster did 26 damage, leaving you with 243 HP
+
+        Your health is currently 243 HP.
+        The An Elf is at 65.0 HP.
+        (Current Gold: 12) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>1
+        Your attack yields 9 damage
+        The monster has 56.0 HP remaining
+        The monster did 83 damage, leaving you with 160 HP
+
+        Your health is currently 160 HP.
+        The An Elf is at 56.0 HP.
+        (Current Gold: 12) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>2
+        5 Gold spent on Shield Potion
+        The monster did 27 damage, your shield repeled the damage,as a result the monster lost 13.5 HP leaving it at 42.5 HP
+
+        Your health is currently 160 HP.
+        The An Elf is at 42.5 HP.
+        (Current Gold: 7) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>2
+        5 Gold spent on Shield Potion
+        The monster did 69 damage, your shield repeled the damage,as a result the monster lost 34.5 HP leaving it at 8.0 HP
+
+        Your health is currently 160 HP.
+        The An Elf is at 8.0 HP.
+        (Current Gold: 2) 
+        How would you like to continue?
+        1) Primary Attack (5-37 damage)
+        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        3) Leave fight (Lose 10 Gold)
+        >>>1
+        Your attack yields 10 damage
+        The monster has -2.0 HP remaining
+        The monster did 10 damage, leaving you with 150 HP
+
+        Fight over
+        You killed the monster.
+        You won 1 Gold from the battle.
+        You have gained 25 health from winning
+        (175, 3)
+    """
+    #Selects random monster
+    monster=new_random_monster()
+    name = monster['name']
+    print(f'You are fighting {name}.')
+    monster_health = int(monster['health'])
+    monster_power = int(monster['power'])
+    print(f'This monster has {monster_health} HP and {monster_power} power.\n')
+    fight = True
+    #fight sequence loop
+    while fight == True:
+        #Death of monster or player
+        if hp <= 0 or monster_health <= 0:
+            print('Fight over')
+            #Death of player
+            if hp <= 0:
+                print('You died! \nResetting Health and Gold\n')
+                hp = 15
+                gold = 5
+            #Death of Monster
+            elif monster_health <= 0:
+                win_gold = random.randint(1, int(monster['money']))
+                print('You killed the monster.')
+                print('You won', win_gold, 'Gold from the battle.')
+                print('You have gained 25 health from winning')
+                gold += win_gold
+                hp += 25
+            fight = False
+        #Player and Monster have Sufficent HP
+        else:
+            fight_choice = getUserFightOptions(hp, gold, monster_health, name)
+            #Primary Attack
+            if fight_choice == 1:
+                damage = random.randint(5, 38)
+                print(f'Your attack yields {damage} damage')
+                monster_health -= damage
+                print(f'The monster has {monster_health} HP remaining')
+                monster_damage = random.randint(5, monster_power)
+                hp -= monster_damage
+                print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
+            #Shield
+            elif fight_choice == 2:
+                gold -= 5
+                print('5 Gold spent on Shield Potion')
+                monster_damage = random.randint(5, monster_power)
+                damage = monster_damage /2
+                monster_health -= damage
+                print(f'The monster did {monster_damage} damage, your shield repeled the damage,'
+                      f'as a result the monster lost {damage} HP leaving it at {monster_health} HP\n')
+            #Run from Fight
+            else:
+                gold -= 10
+                fight = False
+    return hp, gold
+#Answer Validation function
+def validate_answer3(answer):
+    """
+    Validates answers for 3 point menu.
+    
+    Parameters:
+        answer (str): answer given from function call.
+    
+    Returns:
+        answer (str): returns a validate answer for a three option menu.
+    
+    Examples:
+        >>>print(validate_answer3(5))
+        Not acceptable input, please try again
+        >>>3
+        3
+    """  
+    #Validates answers for all menus
+    while not (answer == '1' or answer == '2' or answer == '3'):
+        print ('Not acceptable input, please try again')
+        answer = input()
+    return int(answer)   
 #Function that tests all other functions in module
 def test_functions():
     """Function runs tests on all other function in module"""
@@ -209,5 +490,29 @@ def test_functions():
     print_shop_menu ("Sword", 57.72, "Heal Potion", 78)
     print_shop_menu ("Battle Axe", 178.525, "Cereal", 2.098766)
     print_shop_menu ("Potatoes", 7, "Grapes", 14.98)
+    
+    #Test Conditions for town_menu function
+    print(town_menu(45, 62))
+    print(town_menu(5, 17))
+    print(town_menu(150, 2.4))
+    
+    #Test Conditions for displayFightStatistics function
+    displayFightStatistics(48, 153, 'Dragon')
+    displayFightStatistics(187, 4)
+    displayFightStatistics(4, 16)
+    
+    #Test conditions for validate_answer3 function
+    print(validate_answer3('5'))
+    print(validate_answer3('1'))
+    print(validate_answer3('2'))
+    
+    #Test conditions for getUserFightOptions
+    print(getUserFightOptions(50, 17, 42, 'Goblin'))
+    print(getUserFightOptions(19, 125, 42, 'Dragon'))
+    print(getUserFightOptions(172, 21, 76, 'Ankle Biter'))
+    
+    #Test conditions for monster_fight 
+    print (monster_fight(400, 17))
+    print (monster_fight(25, 127))   
 if __name__ == "__main__":
     test_functions()
