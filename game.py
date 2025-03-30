@@ -15,7 +15,8 @@ import gamefunctions
 
 #Initial Player Stats for in Game use
 player_hp = 250
-player_gold = 15
+player_gold = 100
+player_inventory = []
 play_game = True
 gamefunctions.print_welcome (input('Enter Player Name:\n'))
 
@@ -23,12 +24,14 @@ gamefunctions.print_welcome (input('Enter Player Name:\n'))
 while play_game == True:
     move = gamefunctions.town_menu(player_hp, player_gold)
     if move == 1:
-        player_hp, player_gold = gamefunctions.monster_fight(player_hp, player_gold)
+        player_hp, player_gold, player_inventory = gamefunctions.monster_fight(player_hp, player_gold, player_inventory)
     elif move == 2:
         print('You Slept')
         player_hp = 250
         player_gold -= 10
-    elif move ==3:
+    elif move == 3:
+        gold, player_inventory = gamefunctions.item_shop(player_gold, player_inventory)
+    elif move == 4:
         print('Game Over!')
         print(f'Final Health was: {player_hp}.\nFinal Gold was: {gamefunctions.final_gold(player_gold)}.')
         play_game = False
