@@ -259,7 +259,14 @@ def getUserFightOptions(user_hp, gold, monster_hp, monster_name):
     user_choice = input('1) Primary Attack (5-37 damage)\n'
                         '2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)\n'
                         '3) Leave fight (Lose 10 Gold)\n')
-    user_choice = validate_answer3(user_choice)
+    sufficency = False
+    while sufficency == False:
+        user_choice = validate_answer3(user_choice)
+        if user_choice == 2:
+            sufficency = gold_check(gold, 5)
+            user_choice = input()
+        else:
+            sufficency = True
     return user_choice
 #Fight Sequence Function
 def monster_fight(hp, gold):
@@ -388,47 +395,105 @@ def monster_fight(hp, gold):
     while fight == True:
         #Death of monster or player
         if hp <= 0 or monster_health <= 0:
-            print('Fight over')
-            #Death of player
-            if hp <= 0:
-                print('You died! \nResetting Health and Gold\n')
-                hp = 15
-                gold = 5
-            #Death of Monster
-            elif monster_health <= 0:
-                win_gold = random.randint(1, int(monster['money']))
-                print('You killed the monster.')
-                print('You won', win_gold, 'Gold from the battle.')
-                print('You have gained 25 health from winning')
-                gold += win_gold
-                hp += 25
-            fight = False
+            hp, gold = fight_death(hp, gold, monster_health, monster['money'])
         #Player and Monster have Sufficent HP
         else:
             fight_choice = getUserFightOptions(hp, gold, monster_health, name)
-            #Primary Attack
-            if fight_choice == 1:
-                damage = random.randint(5, 38)
-                print(f'Your attack yields {damage} damage')
-                monster_health -= damage
-                print(f'The monster has {monster_health} HP remaining')
-                monster_damage = random.randint(5, monster_power)
-                hp -= monster_damage
-                print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
-            #Shield
-            elif fight_choice == 2:
-                gold -= 5
-                print('5 Gold spent on Shield Potion')
-                monster_damage = random.randint(5, monster_power)
-                damage = monster_damage /2
-                monster_health -= damage
-                print(f'The monster did {monster_damage} damage, your shield repeled the damage,'
-                      f'as a result the monster lost {damage} HP leaving it at {monster_health} HP\n')
-            #Run from Fight
-            else:
-                gold -= 10
-                fight = False
+            hp, gold, monster_health, fight = fight_attacks(fight_choice, hp, gold, monster_health, monster_power)
     return hp, gold
+#Function controlling death during a monster fight
+def fight_death(hp, gold, monster_hp, monster_gold):
+    """
+    Protocols for death during a monster fight.
+    
+    Parameters:
+        hp (float): current health of player.
+        gold (int): Current gold balance of player.
+        monster_hp (float): current health of monster.
+        monster_gold (int): gold of monster being fought
+    
+    Returns:
+        hp (float): health of player
+        gold (int): gold balance of player
+        
+    Examples:
+        >>>print(fight_death(0, 15, 25, 26))
+        You died! 
+        Resetting Health and Gold
+
+        (15, 5)
+        
+        >>>print(fight_death(25, 16, 0, 27))
+        You killed the monster.
+        You won 24 Gold from the battle.
+        You have gained 25 health from winning
+        (50, 40)
+    """
+    #Death of player
+    if hp <= 0:
+        print('You died! \nResetting Health and Gold\n')
+        hp = 15
+        gold = 5
+    #Death of Monster
+    elif monster_hp <= 0:
+        win_gold = random.randint(1, monster_gold)
+        print('You killed the monster.')
+        print('You won', win_gold, 'Gold from the battle.')
+        print('You have gained 25 health from winning')
+        gold += win_gold
+        hp += 25
+    return hp, gold
+#Function controlling attacks during monster fight
+def fight_attacks(fight_choice, hp, gold, monster_health, monster_power):
+    """
+    Hold attack options and outcomes for a monster fight.
+    
+    Parameters:
+        fight_choice (int): attack being chosen.
+        hp (float): health of player.
+        gold (int): gold balance of player.
+        monster_health (float): health of monster.
+        monster_power (int): power level of monster.
+        
+    Returns:
+        hp (float): updated player health
+        gold (int): updated gold balance of player.
+        monster_health (float): updated monster health.
+        fight (boolean): updated fight status
+    
+    Examples:
+        >>>print(fight_attacks(1, 117, 25, 112, 17))
+        Your attack yields 10 damage
+        The monster has 102 HP remaining
+        The monster did 9 damage, leaving you with 108 HP
+
+        (108, 25, 102, True)
+    """
+    #Primary Attack
+    if fight_choice == 1:
+        fight = True
+        damage = random.randint(5, 38)
+        print(f'Your attack yields {damage} damage')
+        monster_health -= damage
+        print(f'The monster has {monster_health} HP remaining')
+        monster_damage = random.randint(5, monster_power)
+        hp -= monster_damage
+        print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
+    #Shield
+    elif fight_choice == 2:
+        fight = True
+        gold -= 5
+        print('5 Gold spent on Shield Potion')
+        monster_damage = random.randint(5, monster_power)
+        damage = monster_damage /2
+        monster_health -= damage
+        print(f'The monster did {monster_damage} damage, your shield repeled the damage,'
+              f'as a result the monster lost {damage} HP leaving it at {monster_health} HP\n')
+    #Run from Fight
+    else:
+        gold -= 10
+        fight = False
+    return hp, gold, monster_health, fight    
 #Answer Validation function
 def validate_answer3(answer):
     """
@@ -451,6 +516,51 @@ def validate_answer3(answer):
         print ('Not acceptable input, please try again')
         answer = input()
     return int(answer)   
+#Checks to ensure sufficent gold
+def gold_check(gold, gold_need):
+    """
+    Ensures sufficent gold balance for purchase.
+    
+    Parameters:
+        gold (int): current gold balance of player.
+        gold_need (int): the amount of gold neccessary to complete purchase.
+    Returns:
+        Value validation: True or False dependent on sufficency
+    
+    Examples:
+        >>>print (gold_check(15, 6))
+        True
+        
+        >>>print (gold_check(5, 10))
+        Insufficent Gold, Please choose new option
+        False
+    """
+    if gold_need > gold:
+        print('Insufficent Gold, Please choose new option')
+        return False
+    else:
+        return True
+#Ensures gold isnt below zero
+def final_gold(gold):
+    """
+    Ensures final gold level cannot be below 0.
+    
+    Parameters:
+        gold (int): current gold balance of player
+    
+    Returns:
+        gold (int): non-negative gold balance of player
+    
+    Examples:
+        >>>print(final_gold(15)
+        15
+        
+        >>>print(final_gold(-7)
+        0
+    """
+    if gold < 0:
+        gold = 0
+    return gold
 #Function that tests all other functions in module
 def test_functions():
     """Function runs tests on all other function in module"""
@@ -513,6 +623,22 @@ def test_functions():
     
     #Test conditions for monster_fight 
     print (monster_fight(400, 17))
-    print (monster_fight(25, 127))   
+    print (monster_fight(25, 127))  
+
+    #Test conditions for gold_check
+    print(gold_check(15, 6))
+    print(gold_check(5, 10))
+    
+    #Test conditions for final_gold
+    print(final_gold(15))
+    print(final_gold(-7))
+    
+    #Test conditions for fight_death:
+    print(fight_death(0, 15, 25, 26))
+    print(fight_death(25, 16, 0, 27))
+    
+    #Test conditions for fight_attacks:
+    print(fight_attacks(1, 117, 25, 112, 17))
+    print(fight_attacks(3, 117, 32, 112, 17))
 if __name__ == "__main__":
     test_functions()

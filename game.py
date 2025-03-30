@@ -30,7 +30,5 @@ while play_game == True:
         player_gold -= 10
     elif move ==3:
         print('Game Over!')
-        print(f'Final Health was: {player_hp}.\nFinal Gold was: {player_gold}.')
+        print(f'Final Health was: {player_hp}.\nFinal Gold was: {gamefunctions.final_gold(player_gold)}.')
         play_game = False
-
-
