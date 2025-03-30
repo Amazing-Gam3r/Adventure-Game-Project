@@ -786,8 +786,8 @@ def test_functions():
     print(getUserFightOptions(172, 21, 76, 'Ankle Biter'))
     
     #Test conditions for monster_fight 
-    print (monster_fight(400, 17))
-    print (monster_fight(25, 127))  
+    print (monster_fight(400, 17, []))
+    print (monster_fight(25, 127, []))  
 
     #Test conditions for gold_check
     print(gold_check(15, 6))
@@ -802,8 +802,8 @@ def test_functions():
     print(fight_death(25, 16, 0, 27))
     
     #Test conditions for fight_attacks:
-    print(fight_attacks(1, 117, 25, 112, 17))
-    print(fight_attacks(3, 117, 32, 112, 17))
+    print(fight_attacks(1, 117, 25, 112, 17, []))
+    print(fight_attacks(3, 117, 32, 112, 17, []))
     
     #Test conditions for item_shop:
     print(item_shop(73, []))
