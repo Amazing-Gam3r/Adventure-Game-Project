@@ -14,12 +14,8 @@ Establishes initial player stats prior to running the main game loop.
 import gamefunctions
 
 #Initial Player Stats for in Game use
-player_hp = 250
-player_gold = 100
-player_inventory = []
+player_hp, player_gold, player_inventory = gamefunctions.gamestart()
 play_game = True
-gamefunctions.print_welcome (input('Enter Player Name:\n'))
-
 #Main Game Loop
 while play_game == True:
     move = gamefunctions.town_menu(player_hp, player_gold)
@@ -32,6 +28,5 @@ while play_game == True:
     elif move == 3:
         gold, player_inventory = gamefunctions.item_shop(player_gold, player_inventory)
     elif move == 4:
-        print('Game Over!')
-        print(f'Final Health was: {player_hp}.\nFinal Gold was: {gamefunctions.final_gold(player_gold)}.')
+        gamefunctions.gamesave(player_hp, player_gold, player_inventory)
         play_game = False

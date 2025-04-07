@@ -14,6 +14,118 @@ these functions comprise what is required to create an adventure game.
 #These functions can be called upon anywhere within the script to execute their predetrmined actions.
 
 import random
+import os
+import sys
+import json
+def gamestart():
+    """
+    Intiates the adventure game with either default settings or a previously saved game.
+    
+    Parameters:
+        None
+        
+    Returns:
+        player_hp (float): health of player.
+        player_gold (int): gold balance of player.
+        player_inventory (list): Current inventory of player
+        
+    Examples:
+        >>>print(gamestart())
+        Welcome to an Adventure Game!
+        Please choose how to continue:
+        1) New Game
+        2) Load Existing Game
+        3) Quit Now
+        >>>2
+        What is the name of your save file?
+        (Don't include the '.json'):
+        >>>test11
+        Enter Player Name:
+        >>>Tucker
+           Hello, Tucker!   
+        (172.0, 12, [])
+    """
+    print('Welcome to an Adventure Game!')
+    print('Please choose how to continue:')
+    user_choice = input('1) New Game\n'
+                        '2) Load Existing Game\n'
+                        '3) Quit Now\n')
+    user_choice = validate_answer3(user_choice)
+    if user_choice == 1:
+        player_hp = 250
+        player_gold = 100
+        player_inventory = []
+    elif user_choice == 2:
+        player_hp, player_gold, player_inventory = loadgame_start()
+    elif user_choice == 3:
+        print("Please come again")
+        pass
+    print_welcome (input('Enter Player Name:\n'))
+    return player_hp, player_gold, player_inventory
+def loadgame_start():
+    """
+    Loads a game file from memory and outputs data from file.
+    
+    Parameters:
+        None
+    
+    Returns:
+        player_hp (float): player health pulled from save file
+        player_gold (int): player gold pulled from save file
+        player_inventory (list): players inventory pulled from save file
+    
+    Examples:
+        >>>print(loadgame_start())
+        What is the name of your save file?
+        (Don't include the '.json'):
+        >>>test11
+        (172.0, 12, [])
+    """
+    file_name = input("What is the name of your save file?\n(Don't include the '.json'):\n")
+    file_name = str(file_name + '.json')
+    file_good = False
+    while file_good == False:
+        if os.path.isfile(file_name) == True:
+            file_good = True
+        else:
+            print('Invalid Filename, please try again')
+            file_name = input()
+            file_name = file_name + '.json'
+    with open(file_name, 'r') as game_file:
+        data = json.load(game_file)
+        player_hp = float(data['player_hp'])
+        player_gold = int(data['player_gold'])
+        player_inventory = data['player_inventory']
+    return player_hp, player_gold, player_inventory
+def gamesave(hp, gold, inv):
+    """
+    Saves the game file.
+    
+    Parameters:
+        hp (float): player health at point of save.
+        gold (int): player gold balance when saved.
+        inv (list): current player inventory'
+    
+    Returns:
+        Saved File
+    
+    Examples:
+        >>>gamesave(172, 12, [])
+        What would you like to call your save?
+        >>>test11
+        Game Over (Data Saved)!
+        Final Health was: 172.
+        Final Gold was: 12.
+    """    
+    save_name = input('What would you like to call your save?\n')
+    save_name = save_name + '.json'
+    with open(save_name, 'w') as game_files:
+        hp = str(hp)
+        gold = str(gold)
+        game_data = {'player_hp' : hp, 'player_gold' : gold, 'player_inventory' : inv}
+        json.dump(game_data, game_files, indent=2)
+    print('Game Over (Data Saved)!')
+    print(f'Final Health was: {hp}.\nFinal Gold was: {final_gold(int(gold))}.')
 # Defines purchase_item function
 def purchase_item(itemPrice, startingMoney, quantity = 1):
     """
@@ -292,7 +404,7 @@ def town_menu(hp, gold):
                         '1) Leave town (Fight Monster)\n'
                         '2) Sleep (Restore HP for 10 Gold)\n'
                         '3) Shop\n'
-                        '4) Quit\n')
+                        '4) Save & Quit\n')
     #validates users choice
     user_choice = validate_answer4(user_choice)
     return user_choice
@@ -621,7 +733,7 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
         The monster did 13 damage, leaving you with 162 HP
 
         Star Sword has lost 10 durabilty
-        (162, -29, [{'name': 'Star Sword', 'type': 'weapon', 'Durability': 45, 'durability': 35}, 
+        (162, -29, [{'name': 'Star Sword', 'type': 'weapon', 'Durability': 35}, 
         {'name': 'Instant Kill Potion', 'type': 'potion', 'Durability': 1}, 
         {'name': 'Smiley Emoji', 'type': 'emoji', 'Durability': 10000}])
     """    
@@ -647,8 +759,8 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
             hp -= monster_damage
             print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
             print(f'{item['name']} has lost 10 durabilty')
-            item['durability'] = int(item['Durability']) - 10
-            if int(item['durability']) <=0:
+            item['Durability'] = int(item['Durability']) - 10
+            if int(item['Durability']) <=0:
                 print(f'{item['name']} destroyed')
                 inventory.remove(item)
         elif item['type'] == 'potion':
@@ -658,7 +770,7 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
     else:
         print('No usable inventory items')
     return hp, monster_health, inventory
-#Answer Validation function
+#Answer Validation functions
 def validate_answer4(answer):
     """
     Validates answers for 4 point menu.
@@ -679,7 +791,28 @@ def validate_answer4(answer):
     while not (answer == '1' or answer == '2' or answer == '3' or answer == '4'):
         print ('Not acceptable input, please try again')
         answer = input()
-    return int(answer)   
+    return int(answer)  
+def validate_answer3(answer):
+    """
+    Validates answers for 3 point menu.
+    
+    Parameters:
+        answer (str): answer given from function call.
+    
+    Returns:
+        answer (str): returns a validate answer for a four option menu.
+    
+    Examples:
+        >>>print(validate_answer3(5))
+        Not acceptable input, please try again
+        >>>3
+        3
+    """  
+    #Validates answers for all menus
+    while not (answer == '1' or answer == '2' or answer == '3'):
+        print ('Not acceptable input, please try again')
+        answer = input()
+    return int(answer)    
 #Checks to ensure sufficent gold
 def gold_check(gold, gold_need):
     """
@@ -813,6 +946,15 @@ def test_functions():
     print(fight_inventory(175, 118, 65, [{"name" : "Star Sword", "type" : "weapon", "Durability" : 45},
                                                {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1},
                                                {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}]))
+                                               
+    #Test Conditions for loadgame_start:
+    print(loadgame_start())
+    
+    #Test conditions for gamesave:
+    gamesave(172, 12, [])
+    
+    #Test Conditons for gamestart:
+    print(gamestart())
 if __name__ == "__main__":
     player_inventory = []
     test_functions()
