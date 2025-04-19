@@ -340,7 +340,7 @@ def item_shop(gold, inventory):
         | 2) Instant Kill Potion     $81.00 |
         | 3) Smiley Emoji             $2.00 |
         | 4) Exit                     $0.00 |
-        \-----------------------------------/
+        \\-----------------------------------/
         What would you like to buy?
         >>1
         You have purchased Star Sword for 42 gold.
@@ -423,7 +423,7 @@ def print_shop_menu(item1_name, item1_price, item2_name, item2_price, item3_name
         | 2) Heal Potion      $78 |
         | 3) Grapes           $18 |
         | 4) Rock             $19 |
-        \-------------------------/
+        \\-------------------------/
     """
     #formats item lisitngs
     item1_price = f'{int(item1_price):.2f}'
