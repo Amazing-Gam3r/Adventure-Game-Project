@@ -83,8 +83,9 @@ def gamestart():
             player_hp = 250
             player_gold = 100
             player_inventory = []
-            town_x = random.randint(0,9) * 32
-            town_y = random.randint(0,9) * 32
+            #establishes town location not on border of map
+            town_x = random.randint(1,8) * 32
+            town_y = random.randint(1,8) * 32
         elif user_choice == 2: #loads player stats from save file
             player_hp, player_gold, player_inventory, town_x, town_y = loadgame_start()
         
@@ -102,27 +103,7 @@ def gamestart():
         play_game = False
 
     #establishs monster locations
-    monster1 = wanderingMonster.WanderingMonster()
-    # Randomly creates coordinate for monster1 circle
-    monster1.monster_x = random.randint(0, 9) * 32
-    monster1.monster_y = random.randint(0, 9) * 32
-
-    # Ensures monster1 location is not the same as the town location
-    while (monster1.monster_x == town_x) and (monster1.monster_y == town_y):
-        monster1.monster_x = random.randint(0, 9) * 32
-        monster1.monster_y = random.randint(0, 9) * 32
-
-    monster2 = wanderingMonster.WanderingMonster()
-    # Randomly creates coordinate for monster1 circle
-    monster2.monster_x = random.randint(0, 9) * 32
-    monster2.monster_y = random.randint(0, 9) * 32
-
-    # Ensures monster2 location is not the same as the town or monster1 location
-    while (((monster2.monster_x == town_x) and (monster2.monster_y == town_y)) or
-           ((monster2.monster_x == monster1.monster_x) and (monster2.monster_y == monster1.monster_y))):
-        monster2.monster_x = random.randint(0, 9) * 32
-        monster2.monster_y = random.randint(0, 9) * 32
-        
+    monster1, monster2 = wanderingMonster.monster_creation(town_x, town_y)
     return player_hp, player_gold, player_inventory, town_x, town_y, play_game, monster1, monster2
 
 #Loads player stats from save file
@@ -235,14 +216,27 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, 
         pass
     elif monster_yes == True: #if player ended map on a monster
         if monster_1 == True:
-            hp, gold, inventory, monster1 = monster_fight(hp, gold, inventory, monster1)
+            hp, gold, inventory, monster1, monster_death = monster_fight(hp, gold, inventory, monster1)
+            if monster_death == True:
+                monster1.death()
         elif monster_2 == True:
-            hp, gold, inventory, monster2 = monster_fight(hp, gold, inventory, monster2)
-        mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, monster2)
+            hp, gold, inventory, monster2, monster_death = monster_fight(hp, gold, inventory, monster2)
+            if monster_death == True:
+                monster2.death()
+        hp, gold, inventory, play_game, monster1, monster2 = mapUsage(hp, gold, inventory, town_x,
+                                                                      town_y, player_x, player_y, monster1, monster2)
     else: #If player force quit map
         play_game = False
+    monster1.move()
+    monster2.move()
+    monster1, monster2 = monster_death_check(monster1, monster2, town_x, town_y)
     return hp, gold, inventory, play_game, monster1, monster2
 
+#defines check function to ensure proper number of monsters
+def monster_death_check(monster1, monster2, town_x, town_y):
+    if monster1.alive == False and monster2.alive == False:
+        monster1, monster2 = wanderingMonster.monster_creation(town_x, town_y)
+    return monster1, monster2
 #Defines purchase_item function
 def purchase_item(itemPrice, startingMoney, quantity = 1):
     """
@@ -444,7 +438,7 @@ def town_menu(hp, gold):
         You are in town.
         Current HP: 45, Current Gold: 62
         What would you like to do?
-        1) Leave town (Red = Mosnter | Green = Town)
+        1) Enter Map (Green = Town | Everything Else = Monster)
         2) Sleep (Restore HP for 15 Gold)
         3) Shop
         4) Quit
@@ -453,7 +447,7 @@ def town_menu(hp, gold):
     print ('You are in town.')
     print (f'Current HP: {hp}, Current Gold: {gold}')
     user_choice = input('What would you like to do?\n\n'
-                        '1) Leave town (Red = Mosnter | Green = Town)\n'
+                        '1) Enter Map (Green = Town | Everything Else = Monster)\n'
                         '2) Sleep (Restore HP for 10 Gold)\n'
                         '3) Shop\n'
                         '4) Save & Quit\n')
@@ -567,14 +561,15 @@ def monster_fight(hp, gold, inventory, monster):
     while fight == True:
         #Death of monster or player
         if hp <= 0 or monster_health <= 0:
-            hp, gold = fight_death(hp, gold, monster_health, monster.monster['money'])
+            hp, gold, monster_death = fight_death(hp, gold, monster_health, monster.monster['money'])
             fight = False
         #Player and Monster have Sufficient HP
         else:
             fight_choice = getUserFightOptions(hp, gold, monster_health, name)
             (hp, gold, monster_health,
              fight, inventory) = fight_attacks(fight_choice, hp, gold, monster_health, monster_power, inventory)
-    return hp, gold, inventory, monster
+            monster_death = False
+    return hp, gold, inventory, monster, monster_death
 
 #Function controlling death during a monster fight
 def fight_death(hp, gold, monster_hp, monster_gold):
@@ -610,6 +605,7 @@ def fight_death(hp, gold, monster_hp, monster_gold):
         print('You died! \nResetting Health and Gold\n')
         hp = 150
         gold = 50
+        monster_death = False
         
     #Death of Monster
     elif monster_hp <= 0:
@@ -620,7 +616,8 @@ def fight_death(hp, gold, monster_hp, monster_gold):
         #increases health and gold based from winning battle
         gold += win_gold
         hp += 25
-    return hp, gold
+        monster_death = True
+    return hp, gold, monster_death
 
 #Function controlling attacks during monster fight
 def fight_attacks(fight_choice, hp, gold, monster_health, monster_power, inventory):
@@ -686,7 +683,7 @@ def fight_attacks(fight_choice, hp, gold, monster_health, monster_power, invento
         gold -= 10
         fight = False
         
-    return hp, gold, monster_health, fight, inventory    
+    return hp, gold, monster_health, fight, inventory
 
 # allows user to use inventory items during fight
 def fight_inventory(hp, monster_health, monster_power, inventory):
@@ -765,7 +762,7 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
             
     else: #if no items in usable then exits to fight options
         print('No usable inventory items')
-    return hp, monster_health, 
+    return hp, monster_health, inventory
     
 #Answer Validation functions
 def validate_answer4(answer):

@@ -161,6 +161,8 @@ class MapCreate:
         monster_y = monster.monster_y + 16
         monster_color = monster.monster_color #Monster Circle Color
         monster_radius = 10 # Radius of monster circle
+        #draws monster circle border
+        pygame.draw.circle(surface, (0, 0, 0), (monster_x, monster_y), monster_radius + 1)
         #draws monster circle
         pygame.draw.circle(surface, monster_color, (monster_x, monster_y), monster_radius)
 
@@ -230,8 +232,10 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
         #draws town
         map1.drawtown(town_x, town_y, screen)
         #draws monsters
-        map1.drawmonster(monster1, screen)
-        map1.drawmonster(monster2, screen)
+        if monster1.alive == True:
+            map1.drawmonster(monster1, screen)
+        if monster2.alive == True:
+            map1.drawmonster(monster2, screen)
         #draws player
         player1.draw_player(screen)
         
@@ -275,8 +279,10 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
     return player1.player_x, player1.player_y, town_menu, monster_menu, monster_1, monster_2
 #Map test setup
 if __name__ == "__main__":
-    monster1 = wanderingMonster.WanderingMonster()
-    monster2 = wanderingMonster.WanderingMonster()
+    town_x = 0
+    town_y = 0
+    monster1 = wanderingMonster.WanderingMonster(town_x, town_y)
+    monster2 = wanderingMonster.WanderingMonster(town_x, town_y)
     monster1.monster_x = 64
     monster2.monster_x = 128
     print(make_map(32, 32, 32, 32, monster1, monster2))

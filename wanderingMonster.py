@@ -1,11 +1,14 @@
 import random
 class WanderingMonster:
     # Defines random monster function
-    def __init__(self):
+    def __init__(self, town_x, town_y):
         self.monster_x = 0
         self.monster_y = 0
         self.monster = self.new_random_monster()
         self.monster_color = self.monster['color']
+        self.town_x = town_x
+        self.town_y = town_y
+        self.alive = True
     def __str__(self):
         return f'The Monster generated was {self.monster['name']} at position ({self.monster_x},{self.monster_y})'
 
@@ -87,11 +90,50 @@ class WanderingMonster:
         return monster_list[monster_number]
 
     def move(self):
-        if self.monster_x <= 288:
-            self.monster_x += 32
-        elif self.monster_y <= 288:
-            self.monster_y += 32
-        elif self.monster_x == 0:
-            self.monster_x -=32
-        elif self.monster_y == 0:
+        if self.monster_x == 0 and self.monster_y == 288:
             self.monster_y -= 32
+        elif self.monster_x == 0 and self.monster_y > 0:
+            self.monster_y -= 32
+        elif self.monster_x == 0 and self.monster_y == 0:
+            self.monster_x += 32
+        elif self.monster_x < 288 and self.monster_y < 288:
+            self.monster_x += 32
+        elif self.monster_x == 288 and self.monster_y < 288:
+            self.monster_y += 32
+        elif self.monster_x <= 288 and self.monster_y == 288:
+            self.monster_x -= 32
+
+
+        while self.monster_x == self.town_x and self.monster_y == self.town_y:
+            if self.monster_x != 288 or self.monster_y != 288:
+                if self.monster_x == self.town_x:
+                    self.monster_x += 32
+                elif self.monster_y == self.town_y:
+                    self.monster_y += 32
+    def death(self):
+        self.alive = False
+        self.monster_x = 500
+        self.monster_y = 500
+
+def monster_creation(town_x, town_y):
+    monster1 = WanderingMonster(town_x, town_y)
+    # Randomly creates coordinate for monster1 circle
+    monster1.monster_x = random.randint(0, 9) * 32
+    monster1.monster_y = random.randint(0, 9) * 32
+
+    # Ensures monster1 location is not the same as the town location
+    while (monster1.monster_x == town_x) and (monster1.monster_y == town_y):
+        monster1.monster_x = random.randint(0, 9) * 32
+        monster1.monster_y = random.randint(0, 9) * 32
+
+    monster2 = WanderingMonster(town_x, town_y)
+    # Randomly creates coordinate for monster1 circle
+    monster2.monster_x = random.randint(0, 9) * 32
+    monster2.monster_y = random.randint(0, 9) * 32
+
+    # Ensures monster2 location is not the same as the town or monster1 location
+    while (((monster2.monster_x == town_x) and (monster2.monster_y == town_y)) or
+           ((monster2.monster_x == monster1.monster_x) and (monster2.monster_y == monster1.monster_y))):
+        monster2.monster_x = random.randint(0, 9) * 32
+        monster2.monster_y = random.randint(0, 9) * 32
+    return monster1, monster2
