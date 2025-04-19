@@ -249,7 +249,7 @@ def monster_death_check(monster1, monster2, town_x, town_y):
         monster2 (class object): second monster the player can fight.
 
     Example:
-        >>monster_death_check(monster1, monster2, town_x, town_y))
+        >>monster_death_check(monster1, monster2, town_x, town_y)
         monster1, monster2
     """
     if monster1.alive == False and monster2.alive == False:
@@ -679,11 +679,11 @@ def fight_attacks(fight_choice, hp, gold, monster_health, monster_power, invento
         print(f'Your attack yields {damage} damage')
         monster_health -= damage
         print(f'The monster has {monster_health} HP remaining')
-        
-        #Monster attacks player
-        monster_damage = random.randint(5, monster_power)
-        hp -= monster_damage
-        print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
+        if monster_health >= 0: #Ensures monster is alive when they attack
+            #Monster attacks player
+            monster_damage = random.randint(5, monster_power)
+            hp -= monster_damage
+            print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
     
     #Shield
     elif fight_choice == 2:
@@ -767,10 +767,11 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
             print(f'Your attack yields {damage} damage')
             monster_health -= damage
             print(f'The monster has {monster_health} HP remaining')
-            #monster attack on player
-            monster_damage = random.randint(5, monster_power)
-            hp -= monster_damage
-            print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
+            if monster_health >= 0: #ensures monster is alive to attack player.
+                #monster attack on player
+                monster_damage = random.randint(5, monster_power)
+                hp -= monster_damage
+                print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
             print(f'{item['name']} has lost 10 durabilty')
             #decreases durability of sword
             item['Durability'] = int(item['Durability']) - 10
