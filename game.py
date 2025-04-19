@@ -31,7 +31,7 @@ while play_game:
         player_hp = 250
         player_gold -= 10
     elif move == 3: #if player move is three then they go to the shop
-        gold, player_inventory = gamefunctions.item_shop(player_gold, player_inventory)
+        player_gold, player_inventory = gamefunctions.item_shop(player_gold, player_inventory)
     elif move == 4: # If player move is four they are prompted to save the game and the game loop is shut off
         gamefunctions.gamesave(player_hp, player_gold, player_inventory, town_x, town_y)
         play_game = False
