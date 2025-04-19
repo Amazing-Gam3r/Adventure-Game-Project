@@ -6,7 +6,6 @@ loadgame_start():
 gamesave(hp, gold, inv, town_x, town_y):
 mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y):
 purchase_item(itemPrice, startingMoney, quantity = 1):
-new_random_monster():
 print_welcome(name, width = 20):
 item_shop(gold, inventory):
 print_shop_menu(item1Name, item1Price, item2Name, item2Price, item3Name, item3Price, item4Name, item4Price):
@@ -36,6 +35,7 @@ import os #allows for system data retrivial
 import sys
 import json #allows for saving and laoding of json files
 import pygame_system #operates pygame to create a map
+import wanderingMonster
 
 #Starts game with base needed data
 def gamestart():
@@ -206,12 +206,12 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y):
         >>>mapUsage(120, 14, [], 92, 128, 32, 32)
     """
     #Creates pygame screen and map   
-    player_x, player_y, town_yes, monster_yes = pygame_system.make_map(town_x, town_y, player_x, player_y)
+    player_x, player_y, town_yes, monster_yes, monster_data = pygame_system.make_map(town_x, town_y, player_x, player_y)
     play_game = True
     if town_yes == True: #If player ended map on the town
         pass
     elif monster_yes == True: #if player ended map on a monster
-        hp, gold, inventory = monster_fight(hp, gold, inventory)
+        hp, gold, inventory = monster_fight(hp, gold, inventory, monster_data)
         mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y)
     else: #If player force quit map
         play_game = False
@@ -249,79 +249,6 @@ def purchase_item(itemPrice, startingMoney, quantity = 1):
             purchase_yes = True
             money_remain = round(money_remain, 2)
             return quantity, money_remain
-
-#Defines random mosnter function
-def new_random_monster():
-    """
-    Generates Random monster along with it's stats.
-        
-    Parameters:
-        None
-        
-    Returns:
-        A monster with specified stats for:
-            Name
-            Description
-            Health
-            Power
-            Money
-            
-    Example:
-        >>>my_monster = new_random_monster()
-        >>>print (my_monster['name'])
-        A dragon
-        >>>print (my_monster['description'])
-        A powerful Ice dragon capable of much damage, but also much repair. Its Icy Breath is dangerous
-    """
-    monster_number = random.randint(0, 5) # collects random integer value
-    #Following defines all monster possibilties
-    monster_one = {
-        'name': 'A Dragon', 
-        'description': 
-        'A powerful Ice dragon capable of much damage, but also much repair. Its Icy Breath is dangerous', 
-        'health': '300', 
-        'power': '450', 
-        'money': '125'}
-    monster_two = {
-        'name': 'A Dragon', 
-        'description': 
-        "A deadly fire dragon. It's fire blasts bring death and destruction anywhere you go.", 
-        'health': '300', 
-        'power': '300', 
-        'money': '125'}
-    monster_three = {
-        'name': 'An Elf', 
-        'description': 
-        'This Elf is from the long-beard woods and and has influence over nature. It will entwine you with vines', 
-        'health': '100', 
-        'power': '80', 
-        'money': '70'}
-    monster_four = {
-        'name': 'An Elf', 
-        'description': 
-        'This is a rock elf raised along stone river it commands the rocks and will use them aganist you if provoked', 
-        'health': '120', 
-        'power': '95', 
-        'money': '45'}
-    monster_five = {
-        'name': 'A Ork', 
-        'description': 
-        'An ork is a creture little is understood about though ' 
-        'their attacks are random they tend to prefer biting off their foes ankles', 
-        'health': '40', 
-        'power': '130', 
-        'money': '15'}
-    monster_six = {
-        'name': 'A Piglin', 
-        'description': 
-        'Plated in gold Piglins are excellent swordsmen', 
-        'health': '175', 
-        'power': '200', 
-        'money': '250'}
-    # combines all monster possibilties into one list
-    monster_list = [monster_one, monster_two, monster_three, monster_four, monster_five, monster_six]
-    #returns monster based on postion in list and previously generate random integer
-    return monster_list[monster_number]
 
 #A function that a prints welcome sign 
 def print_welcome(name, width = 20):
@@ -923,20 +850,6 @@ def test_functions():
     print (num_purchased, 'items purchased.')
     print (leftover_money, 'money remaining.')
     
-    # test conditions for new_random_monster function
-    my_monster = new_random_monster()
-    print (my_monster['name'])
-    print (my_monster['description'])
-
-    my_monster = new_random_monster()
-    print (my_monster['name'])
-    print (my_monster['money'])
-    
-    my_monster = new_random_monster()
-    print (my_monster['name'])
-    print (my_monster['health'])
-    print (my_monster['power'])
-    
     #Test conditions for print_welcome function using diffrent name lengths and differing field widths
     print_welcome('Jeff')
     print_welcome('Frank')
@@ -996,13 +909,13 @@ def test_functions():
                                                {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1},
                                                {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}]))
                                                
-    #Test Condition for loadgame_start:
+    #Test Condition for load game_start:
     print(loadgame_start())
     
     #Test condition for gamesave:
     gamesave(172, 12, [])
     
-    #Test Conditon for gamestart:
+    #Test Condition for gamestart:
     print(gamestart())
     
     #test condition for mapUsage:
