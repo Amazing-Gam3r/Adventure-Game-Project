@@ -1,7 +1,48 @@
-import random
+"""Contains the componets required to create, generate, move, and regenerate fightable monsters for an adventure game.
+
+This module contains the function:
+    monster_creation(town_x, town_y):
+
+ This module also contains the classes:
+    WanderingMonster(town_x, town_y): used to generate and move fightable monsters.
+
+ Combined these functions and classes produce fightable monsters.
+"""
+
+#wanderingMonster.py
+#Tucker Werhane
+#April 19th, 2025
+#This module generates fightable monsters.
+
+import random #used for genertaing random positions on a map
+
 class WanderingMonster:
+    """WanderingMonster class to generate and move fightable monsters.
+
+    Instance Objects:
+        monster_x (int): x coordinate of the monster in the class instance.
+        monster_y (int): y coordinate of the monster in the class instance.
+        monster (dict): stats of monster generated for class instance.
+        monster_color (color): the color of the monster in the class instance.
+        town_x (int): x coordinate of the town in the class instance.
+        town_y (int): y coordinate of the town in the class instance.
+        alive (bool): if the monster is alive or not.
+
+    Methods:
+        new_random_monster(): generates a new monster.
+        move(): moves the monster around the map.
+        death(): used to move monster off map after the monster is killed.
+        """
+
     # Defines random monster function
     def __init__(self, town_x, town_y):
+        """Intializes WanderingMonster class.
+
+        Example:
+            >>my_monster = WanderingMonster(64, 128)
+            >>print(my_monster.monster["name"]
+            Dragon
+            """
         self.monster_x = 0
         self.monster_y = 0
         self.monster = self.new_random_monster()
@@ -9,9 +50,16 @@ class WanderingMonster:
         self.town_x = town_x
         self.town_y = town_y
         self.alive = True
-    def __str__(self):
-        return f'The Monster generated was {self.monster['name']} at position ({self.monster_x},{self.monster_y})'
 
+    def __str__(self):
+        """Formats string output when instnace is printed.
+
+        Example:
+            >>monster_test = WanderingMonster(64, 128)
+            >>print(monster_test)
+            Piglin at Color: [255, 215, 0] at location: (64, 128)"""
+
+        return f'{self.monster['name']} at Color: {self.monster_color} at location: ({self.town_x}, {self.town_y})'
     def new_random_monster(self):
         """
         Generates Random monster along with its stats.
@@ -23,12 +71,13 @@ class WanderingMonster:
                 Health
                 Power
                 Money
+                Color
 
         Example:
-            >>>my_monster = WanderingMonster.new_random_monster(self)
-            >>>print (my_monster['name'])
+            >>my_monster = WanderingMonster.new_random_monster()
+            >>print (my_monster['name'])
             A dragon
-            >>>print (my_monster['description'])
+            >>print (my_monster['description'])
             A powerful Ice dragon capable of much damage, but also much repair. Its Icy Breath is dangerous
         """
         monster_number = random.randint(0, 5)  # collects random integer value
@@ -90,32 +139,71 @@ class WanderingMonster:
         return monster_list[monster_number]
 
     def move(self):
-        if self.monster_x == 0 and self.monster_y == 288:
+        """Moves monster around the map.
+
+        Follows pattern that eventually ends with monsters circling map border
+
+        Example:
+            >>my_monster = WanderingMonster(256, 256)
+            print(my_monster.monster_x, my_monster.monster_y)
+            0 0
+            >>my_monster.move()
+            print(my_monster.monster_x, my_monster.monster_y)
+            32 0
+        """
+        if self.monster_x == 0 and self.monster_y == 288: #starts to move monsters up left border of map
             self.monster_y -= 32
-        elif self.monster_x == 0 and self.monster_y > 0:
+        elif self.monster_x == 0 and self.monster_y > 0: #moves monsters up left border of map
             self.monster_y -= 32
-        elif self.monster_x == 0 and self.monster_y == 0:
+        elif self.monster_x == 0 and self.monster_y == 0: #Starts moving monster right along top border
             self.monster_x += 32
-        elif self.monster_x < 288 and self.monster_y < 288:
+        elif self.monster_x < 288 and self.monster_y < 288: #moves player to right border
             self.monster_x += 32
-        elif self.monster_x == 288 and self.monster_y < 288:
+        elif self.monster_x == 288 and self.monster_y < 288: #moves player down along right border
             self.monster_y += 32
-        elif self.monster_x <= 288 and self.monster_y == 288:
+        elif self.monster_x <= 288 and self.monster_y == 288: #moves player left along bottom border
             self.monster_x -= 32
 
-
-        while self.monster_x == self.town_x and self.monster_y == self.town_y:
+        while self.monster_x == self.town_x and self.monster_y == self.town_y: #skips monster over town if needed
             if self.monster_x != 288 or self.monster_y != 288:
                 if self.monster_x == self.town_x:
                     self.monster_x += 32
                 elif self.monster_y == self.town_y:
                     self.monster_y += 32
     def death(self):
-        self.alive = False
+        """Updates monsters alive status to dead and move monster off map.
+
+        Example:
+            >>my_monster = WanderingMonster(128, 256)
+            >>print(my_monster.alive)
+            True
+            >>my_monster.death()
+            >>print(my_monster.alive)
+            False
+            """
+        self.alive = False #monster is dead
+        #moves dead monster outside playable border so no fight can be triggered
         self.monster_x = 500
         self.monster_y = 500
 
 def monster_creation(town_x, town_y):
+    """ creates monsters using wanderingMonster class.
+
+    Parameters:
+        town_x (int): x coordinate of town.
+        town_y (int): y coordinate of town.
+
+    Returns:
+        monster1 (class instance): a monster the player can fight
+        monster2 (class instance): a second monster the player can fight
+
+    Example:
+        >>monster1, monster2 = monster_creation(128, 128)
+        >>print(monster1)
+        Piglin at Color: [255, 215, 0] at location: (128, 128)
+        >>print(monster2)
+        Dragon at Color: [153, 255, 255] at location: (128, 128)
+        """
     monster1 = WanderingMonster(town_x, town_y)
     # Randomly creates coordinate for monster1 circle
     monster1.monster_x = random.randint(0, 9) * 32
@@ -137,3 +225,29 @@ def monster_creation(town_x, town_y):
         monster2.monster_x = random.randint(0, 9) * 32
         monster2.monster_y = random.randint(0, 9) * 32
     return monster1, monster2
+
+if __name__ == '__main__':
+    #WanderingMonster Class Initilization test
+    my_monster = WanderingMonster(64, 128)
+    print(my_monster.monster["name"])
+
+    #WanderingMonster Class string format test:
+    monster_test = WanderingMonster(64, 128)
+    print(monster_test)
+
+    #move function test:
+    my_monster = WanderingMonster(256, 256)
+    print(my_monster.monster_x, my_monster.monster_y)
+    my_monster.move()
+    print(my_monster.monster_x, my_monster.monster_y)
+
+    #death function test:
+    my_monster = WanderingMonster(128, 256)
+    print(my_monster.alive)
+    my_monster.death()
+    print(my_monster.alive)
+
+    #monster creation test:
+    monster1, monster2 = monster_creation(128, 128)
+    print(monster1)
+    print(monster2)

@@ -1,10 +1,10 @@
 """Contains the functions needed to launch and operate a map screen.
 
  This module contains the function:
-    make_map(town_x, town_y, start_x, start_y)
+    make_map(town_x, town_y, start_x, start_y):
  
  This module also contains the classes:
-    Player: used for items involving the player in the map
+    Player(start_x, start_y): used for items involving the player in the map
     MapCreate: used to create map objects
  
  Combined these functions and classes can be used to produce an interactive map for an adventure game.
@@ -12,23 +12,24 @@
 
 #pygame_system.py
 #Tucker Werhane
-#April 13th, 2025
+#April 19th, 2025
 #This module uses pygame to create an interactive map screen for an adventure game
 
 #Imports needed modules for code function
 import pygame #Drawing and Screen functions
 import time #Allows time dealy to be used in programming
 import wanderingMonster
+
 #Player class for player operations
 class Player:
     """
     Player class deals with functions and data related to the player.
     
-    Objects:
+    Class Objects:
         player_size (int): fixed value fo side length of player square.
         player_color (color): fixed color representing the player.
         
-    Initial Objects:
+    Instance Objects:
         player_x (int): x position of player
         player_y (int): y position of player
         
@@ -62,7 +63,7 @@ class Player:
             surface: surface player to be drawn onto
         
         Example:
-            >>>player.draw_player(screen)
+            >>player.draw_player(screen)
         """
         #establishes player rectangle
         player = pygame.Rect(self.player_x, self.player_y, self.player_size, self.player_size)
@@ -74,14 +75,17 @@ class MapCreate:
     """
     Draws important characteristics onto map.
     
-    Objects:
-        None
+    Instance Objects:
+        border_size (int): number of pixels of black border around map location circles
         
     Methods:
         drawlines(surface): creates map grid structure
         drawtown(town_x, town_y, surface): creates the circle for town location
         drawmonster (monster_x, monster_y, surface): draws the circle for the monster location
     """
+    def __init__(self):
+        self.border_size = 2
+
     #Draws map grid lines
     def drawlines(self, surface):
         """
@@ -91,7 +95,7 @@ class MapCreate:
             surface: the surface to draw the lines on.
         
         Example:
-            >>>drawlines(screen)
+            >>drawlines(screen)
         """
         #Line settings
         line_color = (100, 100, 100) #Line Color
@@ -123,7 +127,7 @@ class MapCreate:
     #Draws town circle
     def drawtown(self, town_x, town_y, surface):
         """
-        Draws town circle.
+        Draws town circle with black border.
         
         Parameters:
             town_x (int) = x coordinate for where the town will be placed.
@@ -131,30 +135,29 @@ class MapCreate:
             surface: what surface should the town be drawn on.
         
         Examples:
-            >>>drawtown(32, 32, screen)
+            >>drawtown(32, 32, screen)
         """
         #increments town coordinates to land in the center of the grid square
         town_x += 16
         town_y += 16
         town_color = (0, 255, 0) #Town circle color
         town_radius = 12 # Radius of town Circle
-        # draws ring around town
-        pygame.draw.circle(surface, (0,0,0), (town_x, town_y), town_radius + 2)
+        # draws border around town
+        pygame.draw.circle(surface, (0,0,0), (town_x, town_y), town_radius + self.border_size)
         #Draws town circle
         pygame.draw.circle(surface, town_color, (town_x, town_y), town_radius)
     
     #Draws Monster circle    
     def drawmonster(self, monster, surface):
         """
-        Draws the monster circle.
+        Draws the monster circle with a black border.
         
         Parameters:
-            monster_x (int): x coordinate of monster
-            monster_y (int): y coordinate of monster
+            monster (class object): the monster being drawn.
             surface: surface the monster circle will be drawn on
         
         Examples:
-            >>>drawmonster(96, monster1, screen)
+            >>drawmonster(96, monster1, screen)
         """
         #increments monster coordinates to land in the center of the grid square
         monster_x = monster.monster_x + 16
@@ -162,7 +165,7 @@ class MapCreate:
         monster_color = monster.monster_color #Monster Circle Color
         monster_radius = 10 # Radius of monster circle
         #draws monster circle border
-        pygame.draw.circle(surface, (0, 0, 0), (monster_x, monster_y), monster_radius + 1)
+        pygame.draw.circle(surface, (0, 0, 0), (monster_x, monster_y), monster_radius + self.border_size)
         #draws monster circle
         pygame.draw.circle(surface, monster_color, (monster_x, monster_y), monster_radius)
 
@@ -176,16 +179,20 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
         town_y (int): Y coordinate of where town will be drawn.
         start_x (int): X coordinate of where the player currently is.
         start_y (int): Y coordinate of where the player currently is.
+        monster1 (class object): a monster that the player can fight.
+        monster2 (class object): a monster that the player can fight.
     
     Returns:
         player_x (int): ending x coordinate of player.
         player_y (int): ending y coordinate of player.
         town_menu (bool): Status of: if player exited map to town.
         monster_menu (bool): Status of: if player exited map to monster fight.
+        monster_1 (bool): Status of: if player exited map to fight monster 1.
+        monster_2 (bool): Status of: if player exited map to fight monster 2.
     
     Examples:
-        >>>print(make_map(32, 32, 32, 32))
-        (32, 32, True, False)
+        >>print(make_map(32, 32, 32, 32))
+        (32, 32, True, False, False, False)
     """
     #Starts pygame instance
     pygame.init()
@@ -208,7 +215,7 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
     while running:
         #After the first move is complete each iteration will check to see 
         #if the player has landed on the town space or the monster space
-        if first_move_done == True:
+        if first_move_done:
             #When Player on Town Space
             if (player1.player_x == town_x) and (player1.player_y == town_y):
                 running = False #Stops map loop
@@ -232,9 +239,9 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
         #draws town
         map1.drawtown(town_x, town_y, screen)
         #draws monsters
-        if monster1.alive == True:
+        if monster1.alive:
             map1.drawmonster(monster1, screen)
-        if monster2.alive == True:
+        if monster2.alive:
             map1.drawmonster(monster2, screen)
         #draws player
         player1.draw_player(screen)
@@ -277,6 +284,7 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
     #ends pygame instance
     pygame.quit()
     return player1.player_x, player1.player_y, town_menu, monster_menu, monster_1, monster_2
+
 #Map test setup
 if __name__ == "__main__":
     town_x = 0
