@@ -6,6 +6,8 @@ class WanderingMonster:
         self.monster_y = 0
         self.monster = self.new_random_monster()
         self.monster_color = self.monster['color']
+    def __str__(self):
+        return f'The Monster generated was {self.monster['name']} at position ({self.monster_x},{self.monster_y})'
 
     def new_random_monster(self):
         """
@@ -29,7 +31,7 @@ class WanderingMonster:
         monster_number = random.randint(0, 5)  # collects random integer value
         # Following defines all monster possibilities
         monster_one = {
-            'name': 'A Dragon',
+            'name': 'Dragon',
             'description':
                 'A powerful Ice dragon capable of much damage, but also much repair. Its Icy Breath is dangerous',
             'health': '300',
@@ -37,7 +39,7 @@ class WanderingMonster:
             'money': '125',
             'color': [153, 255, 255]}
         monster_two = {
-            'name': 'A Dragon',
+            'name': 'Dragon',
             'description':
                 "A deadly fire dragon. It's fire blasts bring death and destruction anywhere you go.",
             'health': '300',
@@ -45,23 +47,25 @@ class WanderingMonster:
             'money': '125',
             'color': [174, 75, 15]}
         monster_three = {
-            'name': 'An Elf',
+            'name': 'Elf',
             'description':
-                'This Elf is from the long-beard woods and and has influence over nature. It will entwine you with vines',
+                'This Elf is from the long-beard woods and and has influence over nature.' 
+                'It will entwine you with vines',
             'health': '100',
             'power': '80',
             'money': '70',
             'color': [180, 103, 77]}
         monster_four = {
-            'name': 'An Elf',
+            'name': 'Elf',
             'description':
-                'This is a rock elf raised along stone river it commands the rocks and will use them against you if provoked',
+                'This is a rock elf raised along stone river it'
+                'commands the rocks and will use them against you if provoked',
             'health': '120',
             'power': '95',
             'money': '45',
             'color': [197, 197, 197]}
         monster_five = {
-            'name': 'A Ork',
+            'name': 'Ork',
             'description':
                 'An ork is a creature little is understood about though '
                 'their attacks are random they tend to prefer biting off their foes ankles',
@@ -70,7 +74,7 @@ class WanderingMonster:
             'money': '15',
             'color': [220, 220, 220]}
         monster_six = {
-            'name': 'A Piglin',
+            'name': 'Piglin',
             'description':
                 'Plated in gold Pigs are excellent swordsmen',
             'health': '175',

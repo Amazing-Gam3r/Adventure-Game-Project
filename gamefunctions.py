@@ -100,8 +100,30 @@ def gamestart():
         town_y = 0
         print("Please come again")
         play_game = False
+
+    #establishs monster locations
+    monster1 = wanderingMonster.WanderingMonster()
+    # Randomly creates coordinate for monster1 circle
+    monster1.monster_x = random.randint(0, 9) * 32
+    monster1.monster_y = random.randint(0, 9) * 32
+
+    # Ensures monster1 location is not the same as the town location
+    while (monster1.monster_x == town_x) and (monster1.monster_y == town_y):
+        monster1.monster_x = random.randint(0, 9) * 32
+        monster1.monster_y = random.randint(0, 9) * 32
+
+    monster2 = wanderingMonster.WanderingMonster()
+    # Randomly creates coordinate for monster1 circle
+    monster2.monster_x = random.randint(0, 9) * 32
+    monster2.monster_y = random.randint(0, 9) * 32
+
+    # Ensures monster2 location is not the same as the town or monster1 location
+    while (((monster2.monster_x == town_x) and (monster2.monster_y == town_y)) or
+           ((monster2.monster_x == monster1.monster_x) and (monster2.monster_y == monster1.monster_y))):
+        monster2.monster_x = random.randint(0, 9) * 32
+        monster2.monster_y = random.randint(0, 9) * 32
         
-    return player_hp, player_gold, player_inventory, town_x, town_y, play_game
+    return player_hp, player_gold, player_inventory, town_x, town_y, play_game, monster1, monster2
 
 #Loads player stats from save file
 def loadgame_start():
@@ -184,7 +206,7 @@ def gamesave(hp, gold, inv, town_x, town_y):
     print(f'Final Health was: {hp}.\nFinal Gold was: {final_gold(int(gold))}.')
 
 #Creates and utilizes game map    
-def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y):
+def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, monster2):
     """
     Creates map using pygame_system module.
     
@@ -206,16 +228,20 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y):
         >>>mapUsage(120, 14, [], 92, 128, 32, 32)
     """
     #Creates pygame screen and map   
-    player_x, player_y, town_yes, monster_yes, monster_data = pygame_system.make_map(town_x, town_y, player_x, player_y)
+    (player_x, player_y, town_yes,
+     monster_yes, monster_1, monster_2) = pygame_system.make_map(town_x, town_y, player_x, player_y, monster1, monster2)
     play_game = True
     if town_yes == True: #If player ended map on the town
         pass
     elif monster_yes == True: #if player ended map on a monster
-        hp, gold, inventory = monster_fight(hp, gold, inventory, monster_data)
-        mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y)
+        if monster_1 == True:
+            hp, gold, inventory, monster1 = monster_fight(hp, gold, inventory, monster1)
+        elif monster_2 == True:
+            hp, gold, inventory, monster2 = monster_fight(hp, gold, inventory, monster2)
+        mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, monster2)
     else: #If player force quit map
         play_game = False
-    return hp, gold, inventory, play_game
+    return hp, gold, inventory, play_game, monster1, monster2
 
 #Defines purchase_item function
 def purchase_item(itemPrice, startingMoney, quantity = 1):
@@ -503,7 +529,7 @@ def getUserFightOptions(user_hp, gold, monster_hp, monster_name):
     return user_choice
 
 #Fight Sequence Function
-def monster_fight(hp, gold, inventory):
+def monster_fight(hp, gold, inventory, monster):
     """
     Conducts a fight sequence against a monster.
     
@@ -530,25 +556,25 @@ def monster_fight(hp, gold, inventory):
         (175, 3)
     """
     #Selects random monster
-    monster=new_random_monster()
-    name = monster['name']
+    name = monster.monster['name']
     print(f'You are fighting {name}.')
     #establishes monster qualities
-    monster_health = int(monster['health'])
-    monster_power = int(monster['power'])
+    monster_health = int(monster.monster['health'])
+    monster_power = int(monster.monster['power'])
     print(f'This monster has {monster_health} HP and {monster_power} power.\n')
     fight = True
     #fight sequence loop
     while fight == True:
         #Death of monster or player
         if hp <= 0 or monster_health <= 0:
-            hp, gold = fight_death(hp, gold, monster_health, monster['money'])
+            hp, gold = fight_death(hp, gold, monster_health, monster.monster['money'])
             fight = False
-        #Player and Monster have Sufficent HP
+        #Player and Monster have Sufficient HP
         else:
             fight_choice = getUserFightOptions(hp, gold, monster_health, name)
-            hp, gold, monster_health, fight, inventory = fight_attacks(fight_choice, hp, gold, monster_health, monster_power, inventory)
-    return hp, gold, inventory
+            (hp, gold, monster_health,
+             fight, inventory) = fight_attacks(fight_choice, hp, gold, monster_health, monster_power, inventory)
+    return hp, gold, inventory, monster
 
 #Function controlling death during a monster fight
 def fight_death(hp, gold, monster_hp, monster_gold):

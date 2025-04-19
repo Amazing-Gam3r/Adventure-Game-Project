@@ -1,4 +1,4 @@
-"""Contains the functions needed to launch an operate a map screen.
+"""Contains the functions needed to launch and operate a map screen.
 
  This module contains the function:
     make_map(town_x, town_y, start_x, start_y)
@@ -7,7 +7,7 @@
     Player: used for items involving the player in the map
     MapCreate: used to create map objects
  
- Combined these functions and classes can be used to produce a intercative map for an adventure game.
+ Combined these functions and classes can be used to produce an interactive map for an adventure game.
  """
 
 #pygame_system.py
@@ -18,7 +18,6 @@
 #Imports needed modules for code function
 import pygame #Drawing and Screen functions
 import time #Allows time dealy to be used in programming
-import random # used to generate random numbers
 import wanderingMonster
 #Player class for player operations
 class Player:
@@ -63,7 +62,7 @@ class Player:
             surface: surface player to be drawn onto
         
         Example:
-            >>>draw_player(screen)
+            >>>player.draw_player(screen)
         """
         #establishes player rectangle
         player = pygame.Rect(self.player_x, self.player_y, self.player_size, self.player_size)
@@ -105,7 +104,7 @@ class MapCreate:
         for i in range(0, 10):
             pygame.draw.line(surface, line_color, (start_x, start_y), (end_x, end_y))
             
-            #Increments lines by 32 pixels along horixontal axis
+            #Increments lines by 32 pixels along horizontal axis
             start_x += 32
             end_x += 32
         
@@ -139,6 +138,8 @@ class MapCreate:
         town_y += 16
         town_color = (0, 255, 0) #Town circle color
         town_radius = 12 # Radius of town Circle
+        # draws ring around town
+        pygame.draw.circle(surface, (0,0,0), (town_x, town_y), town_radius + 2)
         #Draws town circle
         pygame.draw.circle(surface, town_color, (town_x, town_y), town_radius)
     
@@ -199,7 +200,8 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
     town_menu = False #Sets output of landed on town to false
     monster_menu = False #Sets output of landed on monster to false
     first_move_done = False #Establishes that first movement on map has not been completed
-    
+    monster_1 = False
+    monster_2 = False
     #Main Map Loop
     while running:
         #After the first move is complete each iteration will check to see 
@@ -213,11 +215,13 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
             elif (player1.player_x == monster1.monster_x) and (player1.player_y == monster1.monster_y):
                 running = False #Stops map loop
                 monster_menu = True #Sets output of landed on monster to True
-                monster_data = monster1
+                monster_1 = True
+                monster_2 = False
             elif (player1.player_x == monster2.monster_x) and (player1.player_y == monster2.monster_y):
                 running = False  # Stops map loop
                 monster_menu = True  # Sets output of landed on monster to True
-                monster_data = monster2
+                monster_1 = False
+                monster_2 = True
         
         #fills screen white
         screen.fill([255,255,255])
@@ -268,7 +272,13 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
         time.sleep(.01) #Time delay 
     #ends pygame instance
     pygame.quit()
-    return player1.player_x, player1.player_y, town_menu, monster_menu, monster_data
+    return player1.player_x, player1.player_y, town_menu, monster_menu, monster_1, monster_2
 #Map test setup
 if __name__ == "__main__":
-    print(make_map(32, 32, 32, 32))
+    monster1 = wanderingMonster.WanderingMonster()
+    monster2 = wanderingMonster.WanderingMonster()
+    monster1.monster_x = 64
+    monster2.monster_x = 128
+    print(make_map(32, 32, 32, 32, monster1, monster2))
+    print(monster1.monster['name'])
+    print(monster2.monster['name'])
