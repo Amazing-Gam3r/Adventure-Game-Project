@@ -5,6 +5,7 @@ gamestart():
 loadgame_start():
 gamesave(hp, gold, inv, town_x, town_y):
 mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y):
+monster_death_check(monster1, monster2, town_x, town_y):
 purchase_item(itemPrice, startingMoney, quantity = 1):
 print_welcome(name, width = 20):
 item_shop(gold, inventory):
@@ -26,25 +27,21 @@ these functions comprise what is required to create an adventure game.
 
 #gamefunctions.py
 #Tucker Werhane
-#April 13th, 2025
-#This program holds all functions needed to run and play an adventure game
+#April 18th, 2025
+#This program holds all functions needed to run and play an adventure game.
 
 #Imports needed modules
 import random #genertaes random numbers
 import os #allows for system data retrivial
-import sys
 import json #allows for saving and laoding of json files
 import pygame_system #operates pygame to create a map
-import wanderingMonster
+import wanderingMonster #moves and generates monsters for the player to fight
 
 #Starts game with base needed data
 def gamestart():
     """
     Intiates the adventure game with either default settings or a previously saved game.
     
-    Parameters:
-        None
-        
     Returns:
         player_hp (float): health of player.
         player_gold (int): gold balance of player.
@@ -52,9 +49,11 @@ def gamestart():
         town_x (int): x coordinate of town
         town_y (int): y coordinate of town
         play_game (bool): if game loop wil run after gamestart complete
+        monster1 (class object): a monster the player can fight.
+        monster2 (class object): a second monster the player can fight.
         
     Examples:
-        >>>print(gamestart())
+        >>print(gamestart())
         Welcome to an Adventure Game!
         Please choose how to continue:
         1) New Game
@@ -63,9 +62,9 @@ def gamestart():
         >>>2
         What is the name of your save file?
         (Don't include the '.json'):
-        >>>test11
+        >>test11
         Enter Player Name:
-        >>>Tucker
+        >>Tucker
            Hello, Tucker!   
         (172.0, 12, [])
     """
@@ -80,23 +79,23 @@ def gamestart():
     if user_choice != 3: #if game is to be played
         play_game = True #sets play of game to true
         if user_choice == 1: #Creates player stats from baseline
-            player_hp = 250
-            player_gold = 100
-            player_inventory = []
+            hp = 250
+            gold = 100
+            inventory = []
             #establishes town location not on border of map
             town_x = random.randint(1,8) * 32
             town_y = random.randint(1,8) * 32
         elif user_choice == 2: #loads player stats from save file
-            player_hp, player_gold, player_inventory, town_x, town_y = loadgame_start()
+            hp, gold, inventory, town_x, town_y = loadgame_start()
         
         #prints player welcome
         print_welcome (input('Enter Player Name:\n'))
         
     #game not to be played sets all values to zero and sets game play to false   
     elif user_choice == 3:
-        player_hp = 0
-        player_gold = 0
-        player_inventory = []
+        hp = 0
+        gold = 0
+        inventory = []
         town_x = 0
         town_y = 0
         print("Please come again")
@@ -104,35 +103,32 @@ def gamestart():
 
     #establishs monster locations
     monster1, monster2 = wanderingMonster.monster_creation(town_x, town_y)
-    return player_hp, player_gold, player_inventory, town_x, town_y, play_game, monster1, monster2
+    return hp, gold, inventory, town_x, town_y, play_game, monster1, monster2
 
 #Loads player stats from save file
 def loadgame_start():
     """
     Loads a game file from memory and outputs data from file.
-    
-    Parameters:
-        None
-    
+
     Returns:
-        player_hp (float): player health pulled from save file
-        player_gold (int): player gold pulled from save file
-        player_inventory (list): players inventory pulled from save file
+        hp (float): player health pulled from save file
+        gold (int): player gold pulled from save file
+        inventory (list): players inventory pulled from save file
         town_x (int): x coordinate of town pulled from save file
         town_x (int): y coordinate of town pulled from save file
     
     Examples:
-        >>>print(loadgame_start())
+        >>print(loadgame_start())
         What is the name of your save file?
         (Don't include the '.json'):
-        >>>test11
+        >>test11
         (172.0, 12, [])
     """
     file_name = input("What is the name of your save file?\n(Don't include the '.json'):\n") # Collects save file name
     file_name = str(file_name + '.json') #adds file extension to save name
     file_good = False #sets loop confirming valid name to false
-    while file_good == False:
-        if os.path.isfile(file_name) == True: #checks to make sure file name is valid
+    while not file_good:
+        if os.path.isfile(file_name): #checks to make sure file name is valid
             file_good = True #When file name is valid exits while loop
         else: #if file is invalid prompts user to try again
             print('Invalid Filename, please try again')
@@ -142,12 +138,12 @@ def loadgame_start():
     with open(file_name, 'r') as game_file:
         data = json.load(game_file)
         #extracts data points from save file
-        player_hp = float(data['player_hp'])
-        player_gold = int(data['player_gold'])
-        player_inventory = data['player_inventory']
+        hp = float(data['player_hp'])
+        gold = int(data['player_gold'])
+        inventory = data['player_inventory']
         town_x = int(data['town_x'])
         town_y = int(data['town_y'])
-    return player_hp, player_gold, player_inventory, town_x, town_y
+    return hp, gold, inventory, town_x, town_y
 
 #Saves game data to .json file
 def gamesave(hp, gold, inv, town_x, town_y):
@@ -165,9 +161,9 @@ def gamesave(hp, gold, inv, town_x, town_y):
         Saved File
     
     Examples:
-        >>>gamesave(172, 12, [])
+        >>gamesave(172, 12, [])
         What would you like to call your save?
-        >>>test11
+        >>test11
         Game Over (Data Saved)!
         Final Health was: 172.
         Final Gold was: 12.
@@ -199,46 +195,72 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, 
         town_y (int): y coordinate of town.
         player_x (int): x coordinate of player.
         player_y (int): y coordinate of player.
+        monster1 (class object): a monster the player can fight.
+        monster2 (class object): a second monster the player can fight.
     
     Returns:
         hp (float): player health.
         gold (int): player gold balance.
         play_game (bool): whether game will continue
+        monster1 (class object): a monster the player can fight (with updated information).
+        monster2 (class object): a second monster the player can fight (with updated information).
      
     Examples:
-        >>>mapUsage(120, 14, [], 92, 128, 32, 32)
+        >>mapUsage(120, 14, [], 92, 128, 32, 32)
     """
     #Creates pygame screen and map   
     (player_x, player_y, town_yes,
      monster_yes, monster_1, monster_2) = pygame_system.make_map(town_x, town_y, player_x, player_y, monster1, monster2)
     play_game = True
-    if town_yes == True: #If player ended map on the town
+    if town_yes: #If player ended map on the town
         pass
-    elif monster_yes == True: #if player ended map on a monster
-        if monster_1 == True:
+    elif monster_yes: #if player ended map on a monster
+        if monster_1: #if player exited map from monster 1
             hp, gold, inventory, monster1, monster_death = monster_fight(hp, gold, inventory, monster1)
-            if monster_death == True:
+            if monster_death: #If the monster dies then its stats are updated and the monster is removed from the map
                 monster1.death()
-        elif monster_2 == True:
+        elif monster_2: #if player exited map from monster 2
             hp, gold, inventory, monster2, monster_death = monster_fight(hp, gold, inventory, monster2)
-            if monster_death == True:
+            if monster_death: #If the monster dies then its stats are updated and the monster is removed from the map
                 monster2.death()
+        #reenters map
         hp, gold, inventory, play_game, monster1, monster2 = mapUsage(hp, gold, inventory, town_x,
                                                                       town_y, player_x, player_y, monster1, monster2)
     else: #If player force quit map
         play_game = False
+
+    #moves monsters
     monster1.move()
     monster2.move()
+    #If both monsters are dead then once the player returns to the map there will be new monsters
     monster1, monster2 = monster_death_check(monster1, monster2, town_x, town_y)
     return hp, gold, inventory, play_game, monster1, monster2
 
 #defines check function to ensure proper number of monsters
 def monster_death_check(monster1, monster2, town_x, town_y):
+    """
+    Checks to see if both monsters are dead and if they are generates new monsters.
+
+    Parameters:
+        monster1 (class object): a monster the player can fight.
+        monster2 (class object): a second monster the player can fight.
+        town_x (int): x coordinate of town.
+        town_y (int): y coordinate of town.
+
+    Returns:
+        monster1 (class object): a monster the player can fight.
+        monster2 (class object): second monster the player can fight.
+
+    Example:
+        >>monster_death_check(monster1, monster2, town_x, town_y))
+        monster1, monster2
+    """
     if monster1.alive == False and monster2.alive == False:
         monster1, monster2 = wanderingMonster.monster_creation(town_x, town_y)
     return monster1, monster2
+
 #Defines purchase_item function
-def purchase_item(itemPrice, startingMoney, quantity = 1):
+def purchase_item(item_price, starting_money, quantity = 1):
     """
     Purchases a quantity of items at a specific price returning remaining balance.
     
@@ -253,22 +275,22 @@ def purchase_item(itemPrice, startingMoney, quantity = 1):
     money_remain (float): money remaining after transaction.
     
     Example:
-        >>>num_purchased, leftover_money = purchase_item(7.77, 300, 14)
-        >>>print (num_purchased, 'items purchased.')
+        >>num_purchased, leftover_money = purchase_item(7.77, 300, 14)
+        >>print (num_purchased, 'items purchased.')
         14 items purchased.
-        >>>print (leftover_money, 'money remaining.')
+        >>print (leftover_money, 'money remaining.')
         191.22 money remaining.
         """
     purchase_yes = False
-    while not purchase_yes: #loop allows program to deal with a item quantity request there is not funds for
-        purchasing_price = itemPrice * quantity
-        if purchasing_price > startingMoney:
+    while not purchase_yes: #loop allows program to deal with an item quantity request there is not funds for
+        purchasing_price = item_price * quantity
+        if purchasing_price > starting_money:
             quantity = quantity - 1
-        elif purchasing_price <= startingMoney:
-            money_remain = startingMoney - purchasing_price
+        elif purchasing_price <= starting_money:
+            money_remain = starting_money - purchasing_price
             purchase_yes = True
             money_remain = round(money_remain, 2)
-            return quantity, money_remain
+    return quantity, money_remain
 
 #A function that a prints welcome sign 
 def print_welcome(name, width = 20):
@@ -286,9 +308,9 @@ def print_welcome(name, width = 20):
         Welcome message
         
     Example:
-        >>>print_welcome('Jeff')
+        >>print_welcome('Jeff')
             Hello, Jeff!    
-        >>>print_welcome('Frank')
+        >>print_welcome('Frank')
             Hello, Frank!    
     """
     #Combines name with welcome string
@@ -309,7 +331,7 @@ def item_shop(gold, inventory):
         inventory (list): current items in the players inventory.
     
     Examples:
-        >>>print(item_shop(73, []))
+        >>print(item_shop(73, []))
         Welcome to the Item Shop
         You currently have a balance of 73 gold.
 
@@ -320,7 +342,7 @@ def item_shop(gold, inventory):
         | 4) Exit                     $0.00 |
         \-----------------------------------/
         What would you like to buy?
-        >>>1
+        >>1
         You have purchased Star Sword for 42 gold.
 
         Current gold balance now: 31
@@ -331,15 +353,15 @@ def item_shop(gold, inventory):
     print('Welcome to the Item Shop')
     print('You currently have a balance of', gold, 'gold.\n')
     #estbalishes descriptions of items 
-    Sword = {"name" : "Star Sword", "type" : "weapon", "Durability" : 45}
-    Potion = {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1}
-    Emoji = {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}
+    sword = {"name" : "Star Sword", "type" : "weapon", "Durability" : 45}
+    potion = {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1}
+    emoji = {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}
     print_shop_menu("Star Sword", 42, "Instant Kill Potion", 81, "Smiley Emoji", 2, "Exit" , 0)
     shopping = True
-    while shopping == True: #Shopping loop
+    while shopping: #Shopping loop
         choice = input('What would you like to buy?\n')
         valid_choice = validate_answer4(choice)
-        items = [Sword, Potion, Emoji]
+        items = [sword, potion, emoji]
         shopping = True
         if valid_choice == 4: #Exits shop
             shopping = False
@@ -348,7 +370,7 @@ def item_shop(gold, inventory):
             if items[valid_choice - 1] in inventory: #Checks to see if player already has item
                 print('Item already in inventory')
             elif valid_choice == 1: #purchases item (removes gold from balance and adds item to inventory)
-                if gold_check(gold, 42) == True: #purchases sword
+                if gold_check(gold, 42): #purchases sword
                     print(f'You have purchased {items[valid_choice - 1]['name']} for 42 gold.\n')
                     gold -= 42
                     print(f'Current gold balance now: {gold}')
@@ -356,7 +378,7 @@ def item_shop(gold, inventory):
                     print('Current Inventory')
                     print(inventory)
             elif valid_choice == 2: #purchases potion
-                if gold_check(gold, 81) == True:
+                if gold_check(gold, 81):
                     print(f'You have purchased {items[valid_choice - 1]['name']} for 81 gold.\n')
                     gold -= 81
                     print(f'Current gold balance now: {gold}')
@@ -364,7 +386,7 @@ def item_shop(gold, inventory):
                     print('Current Inventory')
                     print(inventory)   
             elif valid_choice == 3: #purchases smiley face
-                if gold_check(gold, 2) == True:
+                if gold_check(gold, 2):
                     print(f'You have purchased {items[valid_choice - 1]['name']} for 2 gold.\n')
                     gold -= 2
                     print(f'Current gold balance now: {gold}')
@@ -374,19 +396,19 @@ def item_shop(gold, inventory):
     return gold, inventory
 
 #prints a shop menu
-def print_shop_menu(item1Name, item1Price, item2Name, item2Price, item3Name, item3Price, item4Name, item4Price):
+def print_shop_menu(item1_name, item1_price, item2_name, item2_price, item3_name, item3_price, item4_name, item4_price):
     """
     Prints a shop menu given two items and their prices.
 
     Parameters:
-        item1Name (str): Name of first item to be presented in the shop.
-        item1Price (int): Price of first item.
-        item2Name (str): Name of second item presented in shop.
-        item2Price (int): Price of second item.
-        item3Name (str): Name of third item presented in shop.
-        item3Price (int): Price of third item.
-        item4Name (str): Name of fourth item presented in shop.
-        item4Price (int): Price of fourth item.
+        item1_name (str): Name of first item to be presented in the shop.
+        item1_price (int): Price of first item.
+        item2_name (str): Name of second item presented in shop.
+        item2_price (int): Price of second item.
+        item3_name (str): Name of third item presented in shop.
+        item3_price (int): Price of third item.
+        item4_name (str): Name of fourth item presented in shop.
+        item4_price (int): Price of fourth item.
     
     Returns:
         None
@@ -395,7 +417,7 @@ def print_shop_menu(item1Name, item1Price, item2Name, item2Price, item3Name, ite
         Shop Menu: a table with two items and their prices.
     
     Examples:
-        >>>print_shop_menu ("Sword", 57.72, "Heal Potion", 78, 'Grapes', 18, 'Rock', 19)
+        >>print_shop_menu ("Sword", 57.72, "Heal Potion", 78, 'Grapes', 18, 'Rock', 19)
         /-------------------------\
         | 1) Sword            $58 |
         | 2) Heal Potion      $78 |
@@ -404,29 +426,30 @@ def print_shop_menu(item1Name, item1Price, item2Name, item2Price, item3Name, ite
         \-------------------------/
     """
     #formats item lisitngs
-    item1Price = (f'{int(item1Price):.2f}')
-    item2Price = (f'{int(item2Price):.2f}')
-    item3Price = (f'{int(item3Price):.2f}')
-    item4Price = (f'{int(item4Price):.2f}')
+    item1_price = f'{int(item1_price):.2f}'
+    item2_price = f'{int(item2_price):.2f}'
+    item3_price = f'{int(item3_price):.2f}'
+    item4_price = f'{int(item4_price):.2f}'
     #formats maneu design
     top_string = '/' + ('-' * 35) +'\\'
     bottom_string = '\\' + ('-' * 35) +'/'
     #prints menu
     print (top_string)
-    print(f'| 1) {item1Name:<22}{('$' + item1Price):>8} |')
-    print(f'| 2) {item2Name:<22}{('$' + item2Price):>8} |')
-    print(f'| 3) {item3Name:<22}{('$' + item3Price):>8} |')
-    print(f'| 4) {item4Name:<22}{('$' + item4Price):>8} |')
+    print(f'| 1) {item1_name:<22}{('$' + item1_price):>8} |')
+    print(f'| 2) {item2_name:<22}{('$' + item2_price):>8} |')
+    print(f'| 3) {item3_name:<22}{('$' + item3_price):>8} |')
+    print(f'| 4) {item4_name:<22}{('$' + item4_price):>8} |')
     print (bottom_string)
 
 #main game menu
 def town_menu(hp, gold):
     """
-    Prints a initial menu for actions to be taken within the game.
+    Prints an initial menu for actions to be taken within the game.
     
     Parameters:
         hp (int): The amount of health the player currently has.
         gold (float): The current amount of gold the player has.
+
     Returns:
         user_choice: A value of 1, 2, 3, or 4 that corresponds to a specific action set.
     
@@ -434,7 +457,7 @@ def town_menu(hp, gold):
         Town menu: prints a list of possible actions taken
     
     Examples:
-        >>>print(town_menu(45, 62))
+        >>print(town_menu(45, 62))
         You are in town.
         Current HP: 45, Current Gold: 62
         What would you like to do?
@@ -469,7 +492,7 @@ def displayFightStatistics(user_hp, monster_hp, monster_name = 'Monster'):
     Prints:
         Fight_statistics: Displays current health of player and monster.
     Examples:
-        >>>displayFightStatistics(48, 153, Dragon)
+        >>displayFightStatistics(48, 153, Dragon)
         Your health is currently 48 HP.
         The Dragon is at 153 HP.  
     """
@@ -512,11 +535,11 @@ def getUserFightOptions(user_hp, gold, monster_hp, monster_name):
                         '4) Leave fight (Lose 10 Gold)\n')
     #ensures sufficent funds for shield potion
     sufficency = False
-    while sufficency == False:
+    while not sufficency:
         user_choice = validate_answer4(user_choice)
         if user_choice == 2:
             sufficency = gold_check(gold, 5)
-            if sufficency == False:
+            if not sufficency:
                 user_choice = input()
         else:
             sufficency = True
@@ -529,15 +552,18 @@ def monster_fight(hp, gold, inventory, monster):
     
     Parameters:
         hp (int): Current health of player.
-        gold (float): Current money held by the player
-        inventory (list): current inventory obtained by player
+        gold (float): Current money held by the player.
+        inventory (list): current inventory obtained by player.
+        monster (class object): the monster the player is fighting.
         
     Returns: hp, gold
         hp (int): remaining player health after battle.
         gold (float) remaing gold held by player after battle.
+        monster (class object): the monster the player fought.
+        monster_death (bool): whether the player killed the monster.
         
     Examples:
-        >>>print (monster_fight(400, 17))
+        >>print (monster_fight(400, 17, [], monster1))
         You are fighting An Elf.
         This monster has 120 HP and 95 power.
 
@@ -547,7 +573,7 @@ def monster_fight(hp, gold, inventory, monster):
         You killed the monster.
         You won 1 Gold from the battle.
         You have gained 25 health from winning
-        (175, 3)
+        (175, 3, monster, True)
     """
     #Selects random monster
     name = monster.monster['name']
@@ -558,7 +584,7 @@ def monster_fight(hp, gold, inventory, monster):
     print(f'This monster has {monster_health} HP and {monster_power} power.\n')
     fight = True
     #fight sequence loop
-    while fight == True:
+    while fight:
         #Death of monster or player
         if hp <= 0 or monster_health <= 0:
             hp, gold, monster_death = fight_death(hp, gold, monster_health, monster.monster['money'])
@@ -585,15 +611,16 @@ def fight_death(hp, gold, monster_hp, monster_gold):
     Returns:
         hp (float): health of player
         gold (int): gold balance of player
+        monster_death (bool): whether the player killed the monster.
         
     Examples:
-        >>>print(fight_death(0, 15, 25, 26))
+        >>print(fight_death(0, 15, 25, 26))
         You died! 
         Resetting Health and Gold
 
         (150, 50)
         
-        >>>print(fight_death(25, 16, 0, 27))
+        >>print(fight_death(25, 16, 0, 27))
         You killed the monster.
         You won 24 Gold from the battle.
         You have gained 25 health from winning
@@ -605,7 +632,7 @@ def fight_death(hp, gold, monster_hp, monster_gold):
         print('You died! \nResetting Health and Gold\n')
         hp = 150
         gold = 50
-        monster_death = False
+        monster_death = False #player died therfore monster didn't die
         
     #Death of Monster
     elif monster_hp <= 0:
@@ -616,7 +643,7 @@ def fight_death(hp, gold, monster_hp, monster_gold):
         #increases health and gold based from winning battle
         gold += win_gold
         hp += 25
-        monster_death = True
+        monster_death = True #player killed the monster
     return hp, gold, monster_death
 
 #Function controlling attacks during monster fight
@@ -639,7 +666,7 @@ def fight_attacks(fight_choice, hp, gold, monster_health, monster_power, invento
         fight (boolean): updated fight status
     
     Examples:
-        >>>print(fight_attacks(1, 117, 25, 112, 17))
+        >>print(fight_attacks(1, 117, 25, 112, 17))
         Your attack yields 10 damage
         The monster has 102 HP remaining
         The monster did 9 damage, leaving you with 108 HP
@@ -693,7 +720,7 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
     Parameters:
         hp (float): players health
         monster_health (float): monsters health.
-        monster_power (int): maximum damage of monster
+        monster_power (int): maximum damage produced by monster
         inventory (list): current items in players inventory
         
     Returns:
@@ -702,9 +729,9 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
         inventory (list): current items in players inventory
     
     Examples:
-        >>>print(fight_inventory(175, 118, 65, [{"name" : "Star Sword", "type" : "weapon", "Durability" : 45},
+        >>print(fight_inventory(175, 118, 65, [{"name" : "Star Sword", "type" : "weapon", "Durability" : 45},
                                                {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1},
-                                               {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}]
+                                               {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}]))
         Usable inventory
         [{'name': 'Star Sword', 'type': 'weapon', 'Durability': 45}]
         Choose item to use
@@ -725,13 +752,13 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
     
     #adds usable items to usable inventory
     for i in inventory:
-        if i['type'] == ('weapon'):
+        if i['type'] == 'weapon':
             invt.append(i)
-        elif i['type'] == ('potion'):
+        elif i['type'] == 'potion':
             invt.append(i)
     print('Usable inventory')
     print(invt)
-    if invt != []: #if there is a usable item then a choice is made between items
+    if invt: #if there is a usable item then a choice is made between items
         print('Choose item to use')
         item_choice = input(f'{len(invt)} options:\n')
         item = invt[int(item_choice) - 1]
@@ -776,9 +803,9 @@ def validate_answer4(answer):
         answer (str): returns a validate answer for a four option menu.
     
     Examples:
-        >>>print(validate_answer3(5))
+        >>print(validate_answer3(5))
         Not acceptable input, please try again
-        >>>3
+        >>3
         3
     """  
     #Validates answers for menus with 4 options
@@ -797,9 +824,9 @@ def validate_answer3(answer):
         answer (str): returns a validate answer for a four option menu.
     
     Examples:
-        >>>print(validate_answer3(5))
+        >>print(validate_answer3(5))
         Not acceptable input, please try again
-        >>>3
+        >>3
         3
     """  
     #Validates answers for menus with 3 options
@@ -820,10 +847,10 @@ def gold_check(gold, gold_need):
         Value validation: True or False dependent on sufficency
     
     Examples:
-        >>>print (gold_check(15, 6))
+        >>print (gold_check(15, 6))
         True
         
-        >>>print (gold_check(5, 10))
+        >>print (gold_check(5, 10))
         Insufficent Gold, Please choose new option
         False
     """
@@ -846,10 +873,10 @@ def final_gold(gold):
         gold (int): non-negative gold balance of player
     
     Examples:
-        >>>print(final_gold(15)
+        >>print(final_gold(15))
         15
         
-        >>>print(final_gold(-7)
+        >>print(final_gold(-7))
         0
     """
     #if gold is less than zero gold is set to zero
@@ -904,8 +931,8 @@ def test_functions():
     print(getUserFightOptions(172, 21, 76, 'Ankle Biter'))
     
     #Test conditions for monster_fight 
-    print (monster_fight(400, 17, []))
-    print (monster_fight(25, 127, []))  
+    print (monster_fight(400, 17, [], wanderingMonster.WanderingMonster(32, 32)))
+    print (monster_fight(25, 127, [], wanderingMonster.WanderingMonster(32, 32)))
 
     #Test conditions for gold_check
     print(gold_check(15, 6))
@@ -936,13 +963,15 @@ def test_functions():
     print(loadgame_start())
     
     #Test condition for gamesave:
-    gamesave(172, 12, [])
+    gamesave(172, 12, [], 32, 32)
     
     #Test Condition for gamestart:
     print(gamestart())
     
     #test condition for mapUsage:
-    print(mapUsage(120, 14, [], 92, 128, 32, 32))
+    print(mapUsage(120, 14, [], 92, 128, 32, 32,
+                   wanderingMonster.WanderingMonster(32, 32),
+                   wanderingMonster.WanderingMonster(32, 32)))
 
 #Runs test_functions if module run directly    
 if __name__ == "__main__":
