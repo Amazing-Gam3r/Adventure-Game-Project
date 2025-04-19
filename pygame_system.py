@@ -254,7 +254,9 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
             #Detects when a key has been pushed down
             elif event.type == pygame.KEYDOWN:
                 first_move_done = True
-                
+                #moves monsters
+                monster1.move()
+                monster2.move()
                 #Moves player up if up arrow is pressed
                 if event.key == pygame.K_UP:
                     if player1.player_y >= 32:

@@ -50,6 +50,7 @@ class WanderingMonster:
         self.town_x = town_x
         self.town_y = town_y
         self.alive = True
+        self.player_moves = 0
 
     def __str__(self):
         """Formats string output when instnace is printed.
@@ -139,7 +140,7 @@ class WanderingMonster:
         return monster_list[monster_number]
 
     def move(self):
-        """Moves monster around the map.
+        """Moves monster around the map every other time the player moves.
 
         Follows pattern that eventually ends with monsters circling map border
 
@@ -151,25 +152,28 @@ class WanderingMonster:
             print(my_monster.monster_x, my_monster.monster_y)
             32 0
         """
-        if self.monster_x == 0 and self.monster_y == 288: #starts to move monsters up left border of map
-            self.monster_y -= 32
-        elif self.monster_x == 0 and self.monster_y > 0: #moves monsters up left border of map
-            self.monster_y -= 32
-        elif self.monster_x == 0 and self.monster_y == 0: #Starts moving monster right along top border
-            self.monster_x += 32
-        elif self.monster_x < 288 and self.monster_y < 288: #moves player to right border
-            self.monster_x += 32
-        elif self.monster_x == 288 and self.monster_y < 288: #moves player down along right border
-            self.monster_y += 32
-        elif self.monster_x <= 288 and self.monster_y == 288: #moves player left along bottom border
-            self.monster_x -= 32
+        #increments player moves and moves monsters every other player move
+        self.player_moves += 1
+        if self.player_moves % 2 == 0:
+            if self.monster_x == 0 and self.monster_y == 288: #starts to move monsters up left border of map
+                 self.monster_y -= 32
+            elif self.monster_x == 0 and self.monster_y > 0: #moves monsters up left border of map
+                self.monster_y -= 32
+            elif self.monster_x == 0 and self.monster_y == 0: #Starts moving monster right along top border
+                self.monster_x += 32
+            elif self.monster_x < 288 and self.monster_y < 288: #moves player to right border
+                self.monster_x += 32
+            elif self.monster_x == 288 and self.monster_y < 288: #moves player down along right border
+                self.monster_y += 32
+            elif self.monster_x <= 288 and self.monster_y == 288: #moves player left along bottom border
+                self.monster_x -= 32
 
-        while self.monster_x == self.town_x and self.monster_y == self.town_y: #skips monster over town if needed
-            if self.monster_x != 288 or self.monster_y != 288:
-                if self.monster_x == self.town_x:
-                    self.monster_x += 32
-                elif self.monster_y == self.town_y:
-                    self.monster_y += 32
+            while self.monster_x == self.town_x and self.monster_y == self.town_y: #skips monster over town if needed
+                if self.monster_x != 288 or self.monster_y != 288:
+                    if self.monster_x == self.town_x:
+                        self.monster_x += 32
+                    elif self.monster_y == self.town_y:
+                        self.monster_y += 32
     def death(self):
         """Updates monsters alive status to dead and move monster off map.
 

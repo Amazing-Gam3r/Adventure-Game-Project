@@ -229,9 +229,6 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, 
     else: #If player force quit map
         play_game = False
 
-    #moves monsters
-    monster1.move()
-    monster2.move()
     #If both monsters are dead then once the player returns to the map there will be new monsters
     monster1, monster2 = monster_death_check(monster1, monster2, town_x, town_y)
     return hp, gold, inventory, play_game, monster1, monster2
