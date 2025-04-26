@@ -65,10 +65,14 @@ class Player:
         Example:
             >>player.draw_player(screen)
         """
-        #establishes player rectangle
-        player = pygame.Rect(self.player_x, self.player_y, self.player_size, self.player_size)
-        #draws player rectangle
-        pygame.draw.rect(surface, self.player_color, player)
+        try: #Uses player image file
+            player_image = pygame.image.load('images/player.png')
+            surface.blit(player_image, (self.player_x, self.player_y))
+        except: #If image file cannot be found then rectangle is created
+            #establishes player rectangle
+            player = pygame.Rect(self.player_x, self.player_y, self.player_size, self.player_size)
+            #draws player rectangle
+            pygame.draw.rect(surface, self.player_color, player)
 
 #  MapCreate class for map objects      
 class MapCreate:
@@ -159,15 +163,19 @@ class MapCreate:
         Examples:
             >>drawmonster(96, monster1, screen)
         """
-        #increments monster coordinates to land in the center of the grid square
-        monster_x = monster.monster_x + 16
-        monster_y = monster.monster_y + 16
-        monster_color = monster.monster_color #Monster Circle Color
-        monster_radius = 10 # Radius of monster circle
-        #draws monster circle border
-        pygame.draw.circle(surface, (0, 0, 0), (monster_x, monster_y), monster_radius + self.border_size)
-        #draws monster circle
-        pygame.draw.circle(surface, monster_color, (monster_x, monster_y), monster_radius)
+        try: #creates monster image
+            monster_image = pygame.image.load(f'images/{monster.image}.png')
+            surface.blit(monster_image, (monster.monster_x, monster.monster_y))
+        except: #Creates color coordinated circle based on monster type if monster image cannot be found
+            #increments monster coordinates to land in the center of the grid square
+            monster_x = monster.monster_x + 16
+            monster_y = monster.monster_y + 16
+            monster_color = monster.monster_color #Monster Circle Color
+            monster_radius = 10 # Radius of monster circle
+            #draws monster circle border
+            pygame.draw.circle(surface, (0, 0, 0), (monster_x, monster_y), monster_radius + self.border_size)
+            #draws monster circle
+            pygame.draw.circle(surface, monster_color, (monster_x, monster_y), monster_radius)
 
 #Function running pygame screen
 def make_map(town_x, town_y, start_x, start_y, monster1, monster2):

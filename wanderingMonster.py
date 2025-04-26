@@ -47,6 +47,7 @@ class WanderingMonster:
         self.monster_y = 0
         self.monster = self.new_random_monster()
         self.monster_color = self.monster['color']
+        self.monster_image = self.monster['image'] #image for monster
         self.town_x = town_x
         self.town_y = town_y
         self.alive = True
@@ -90,7 +91,8 @@ class WanderingMonster:
             'health': '300',
             'power': '450',
             'money': '125',
-            'color': [153, 255, 255]}
+            'color': [153, 255, 255],
+            'image': 'ice_dragon'}
         monster_two = {
             'name': 'Dragon',
             'description':
@@ -98,7 +100,8 @@ class WanderingMonster:
             'health': '300',
             'power': '300',
             'money': '125',
-            'color': [174, 75, 15]}
+            'color': [174, 75, 15],
+            'image': 'fire_dragon'}
         monster_three = {
             'name': 'Elf',
             'description':
@@ -107,7 +110,8 @@ class WanderingMonster:
             'health': '100',
             'power': '80',
             'money': '70',
-            'color': [180, 103, 77]}
+            'color': [180, 103, 77],
+            'image': 'vine_elf'}
         monster_four = {
             'name': 'Elf',
             'description':
@@ -116,16 +120,18 @@ class WanderingMonster:
             'health': '120',
             'power': '95',
             'money': '45',
-            'color': [197, 197, 197]}
+            'color': [197, 197, 197],
+            'image': 'rock_elf'}
         monster_five = {
-            'name': 'Ork',
+            'name': 'Orc',
             'description':
-                'An ork is a creature little is understood about though '
+                'An orc is a creature little is understood about though '
                 'their attacks are random they tend to prefer biting off their foes ankles',
             'health': '40',
             'power': '130',
             'money': '15',
-            'color': [220, 220, 220]}
+            'color': [220, 220, 220],
+            'image': 'orc'}
         monster_six = {
             'name': 'Piglin',
             'description':
@@ -133,7 +139,8 @@ class WanderingMonster:
             'health': '175',
             'power': '200',
             'money': '250',
-            'color': [255, 215, 0]}
+            'color': [255, 215, 0],
+            'image': 'piglin'}
         # combines all monster possibilities into one list
         monster_list = [monster_one, monster_two, monster_three, monster_four, monster_five, monster_six]
         # returns monster based on position in list and previously generate random integer
