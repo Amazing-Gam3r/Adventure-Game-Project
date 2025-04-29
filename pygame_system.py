@@ -141,15 +141,19 @@ class MapCreate:
         Examples:
             >>drawtown(32, 32, screen)
         """
-        #increments town coordinates to land in the center of the grid square
-        town_x += 16
-        town_y += 16
-        town_color = (0, 255, 0) #Town circle color
-        town_radius = 12 # Radius of town Circle
-        # draws border around town
-        pygame.draw.circle(surface, (0,0,0), (town_x, town_y), town_radius + self.border_size)
-        #Draws town circle
-        pygame.draw.circle(surface, town_color, (town_x, town_y), town_radius)
+        try:
+            town_icon = pygame.image.load('images/town.png')
+            surface.blit(town_icon, (town_x, town_y))
+        except: #Used if town icon not present
+            #increments town coordinates to land in the center of the grid square
+            town_x += 16
+            town_y += 16
+            town_color = (0, 255, 0) #Town circle color
+            town_radius = 12 # Radius of town Circle
+            # draws border around town
+            pygame.draw.circle(surface, (0,0,0), (town_x, town_y), town_radius + self.border_size)
+            #Draws town circle
+            pygame.draw.circle(surface, town_color, (town_x, town_y), town_radius)
     
     #Draws Monster circle    
     def drawmonster(self, monster, surface):
@@ -164,7 +168,7 @@ class MapCreate:
             >>drawmonster(96, monster1, screen)
         """
         try: #creates monster image
-            monster_image = pygame.image.load(f'images/{monster.image}.png')
+            monster_image = pygame.image.load(f'images/{monster.monster_image}.png')
             surface.blit(monster_image, (monster.monster_x, monster.monster_y))
         except: #Creates color coordinated circle based on monster type if monster image cannot be found
             #increments monster coordinates to land in the center of the grid square
