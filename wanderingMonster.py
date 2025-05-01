@@ -85,7 +85,7 @@ class WanderingMonster:
         monster_number = random.randint(0, 5)  # collects random integer value
         # Following defines all monster possibilities
         monster_one = {
-            'name': 'Dragon',
+            'name': 'Ice Dragon',
             'description':
                 'A powerful Ice dragon capable of much damage, but also much repair. Its Icy Breath is dangerous',
             'health': '300',
@@ -94,7 +94,7 @@ class WanderingMonster:
             'color': [153, 255, 255],
             'image': 'ice_dragon'}
         monster_two = {
-            'name': 'Dragon',
+            'name': 'Fire Dragon',
             'description':
                 "A deadly fire dragon. It's fire blasts bring death and destruction anywhere you go.",
             'health': '300',
@@ -103,7 +103,7 @@ class WanderingMonster:
             'color': [174, 75, 15],
             'image': 'fire_dragon'}
         monster_three = {
-            'name': 'Elf',
+            'name': 'Vine Elf',
             'description':
                 'This Elf is from the long-beard woods and and has influence over nature.' 
                 'It will entwine you with vines',
@@ -113,7 +113,7 @@ class WanderingMonster:
             'color': [180, 103, 77],
             'image': 'vine_elf'}
         monster_four = {
-            'name': 'Elf',
+            'name': 'Rock Elf',
             'description':
                 'This is a rock elf raised along stone river it'
                 'commands the rocks and will use them against you if provoked',
