@@ -11,7 +11,7 @@ This module contains the function:
 
 #wanderingMonster.py
 #Tucker Werhane
-#April 19th, 2025
+#April 30th, 2025
 #This module generates fightable monsters.
 
 import random #used for genertaing random positions on a map
