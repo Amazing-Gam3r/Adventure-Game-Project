@@ -467,7 +467,7 @@ def town_menu(hp, gold):
     print ('You are in town.')
     print (f'Current HP: {hp}, Current Gold: {gold}')
     user_choice = input('What would you like to do?\n\n'
-                        '1) Enter Map (Green = Town | Everything Else = Monster)\n'
+                        '1) Enter Map\n'
                         '2) Sleep (Restore HP for 10 Gold)\n'
                         '3) Shop\n'
                         '4) Save & Quit\n')
