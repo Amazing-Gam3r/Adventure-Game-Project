@@ -257,11 +257,13 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2, trader):
                 running = False #Stops map loop
                 town_menu = True #Sets output of landed on town to True
             #When player on Monster space
-            elif (player1.player_x == monster1.monster_x) and (player1.player_y == monster1.monster_y) and monster1.alive == True:
+            elif ((player1.player_x == monster1.monster_x) and (player1.player_y == monster1.monster_y)
+                  and monster1.alive == True):
                 running = False #Stops map loop
                 monster_menu = True #Sets output of landed on monster to True
                 monster_1 = True
-            elif (player1.player_x == monster2.monster_x) and (player1.player_y == monster2.monster_y) and monster2.alive == True:
+            elif ((player1.player_x == monster2.monster_x) and (player1.player_y == monster2.monster_y)
+                  and monster2.alive == True):
                 running = False  # Stops map loop
                 monster_menu = True  # Sets output of landed on monster to True
                 monster_2 = True

@@ -182,7 +182,8 @@ def gamesave(hp, gold, inv, town_x, town_y):
         gold = str(gold)
         town_x = str(town_x)
         town_y = str(town_y)
-        game_data = {'player_hp' : hp, 'player_gold' : gold, 'player_inventory' : inv, 'town_x' : town_x, 'town_y' : town_y}
+        game_data = {'player_hp' : hp, 'player_gold' : gold, 'player_inventory' : inv,
+                     'town_x' : town_x, 'town_y' : town_y}
         json.dump(game_data, game_files, indent=2)
     #prints game ending message
     print('Game Over (Data Saved)!')
@@ -933,9 +934,12 @@ def test_functions():
     print_welcome('Carson')
     
     #Test Conditions for print_shop_menu using varietys of items and prices
-    print_shop_menu ("Sword", 57.72, "Heal Potion", 78, "Rock", 18, "Potatoes", 7)
-    print_shop_menu ("Battle Axe", 178.525, "Cereal", 2.098766, "Grapes", 16, "Sword", 57.72)
-    print_shop_menu ("Potatoes", 7, "Grapes", 14.98, 'Oranges', 13.72, "Battle Axe", 178.525)
+    print_shop_menu ("Sword", 57.72, "Heal Potion", 78,
+                     "Rock", 18, "Potatoes", 7)
+    print_shop_menu ("Battle Axe", 178.525, "Cereal", 2.098766,
+                     "Grapes", 16, "Sword", 57.72)
+    print_shop_menu ("Potatoes", 7, "Grapes", 14.98,
+                     'Oranges', 13.72, "Battle Axe", 178.525)
     
     #Test Conditions for town_menu function
     print(town_menu(45, 62))
@@ -982,9 +986,10 @@ def test_functions():
     print(item_shop(42, []))
     
     #Test condition for fight_inventory:
-    print(fight_inventory(175, 118, 65, [{"name" : "Star Sword", "type" : "weapon", "Durability" : 45},
-                                               {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1},
-                                               {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}]))
+    print(fight_inventory(175, 118, 65, [
+                                                {"name" : "Star Sword", "type" : "weapon", "Durability" : 45},
+                                                {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1},
+                                                {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}]))
                                                
     #Test Condition for load game_start:
     print(loadgame_start())
