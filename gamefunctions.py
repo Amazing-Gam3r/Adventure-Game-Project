@@ -369,7 +369,7 @@ def item_shop(gold, inventory):
     print('Welcome to the Item Shop')
     print('You currently have a balance of', gold, 'gold.\n')
     #estbalishes descriptions of items 
-    sword = {"name" : "Star Sword", "type" : "weapon", "Durability" : 45}
+    sword = {"name" : "Star Sword", "type" : "weapon", "power" : 80, "Durability" : 45}
     potion = {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1}
     emoji = {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}
     print_shop_menu("Star Sword", 42, "Instant Kill Potion", 81,
@@ -760,7 +760,7 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
         The monster did 13 damage, leaving you with 162 HP
 
         Star Sword has lost 10 durabilty
-        (162, -29, [{'name': 'Star Sword', 'type': 'weapon', 'Durability': 35}, 
+        (162, -29, [{'name': 'Star Sword', 'type': 'weapon', "power": 80, 'Durability': 35},
         {'name': 'Instant Kill Potion', 'type': 'potion', 'Durability': 1}, 
         {'name': 'Smiley Emoji', 'type': 'emoji', 'Durability': 10000}])
     """    
@@ -776,14 +776,23 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
     print('Usable inventory')
     print(invt)
     if invt: #if there is a usable item then a choice is made between items
-        print('Choose item to use')
-        item_choice = input(f'{len(invt)} options:\n')
-        item = invt[int(item_choice) - 1]
-        print(f'You have equiped {item['name']}, currently at {item['Durability']} durability')
+        valid = False
+        while valid == False:
+            try:
+                print('Choose item to use')
+                item_choice = input(f'{len(invt)} options:\n')
+                item = invt[int(item_choice) - 1]
+                print(f'You have equiped {item['name']}, currently at {item['Durability']} durability')
+                valid = True
+            except:
+                print('Invalid Choice')
+                valid = False
         
         if item['type'] == 'weapon': #sword atatck
+            #gets power from weapon type
+            weapon_power = item["power"]
             #damage value
-            damage = random.randint(50, 180)
+            damage = random.randint(weapon_power - 10, weapon_power + 5)
             print(f'Your attack yields {damage} damage')
             monster_health -= damage
             print(f'The monster has {monster_health} HP remaining')
@@ -792,9 +801,9 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
                 monster_damage = random.randint(5, monster_power)
                 hp -= monster_damage
                 print(f'The monster did {monster_damage} damage, leaving you with {hp} HP\n')
-            print(f'{item['name']} has lost 10 durabilty')
+            print(f'{item['name']} has lost 5 durabilty points')
             #decreases durability of sword
-            item['Durability'] = int(item['Durability']) - 10
+            item['Durability'] = int(item['Durability']) - 5
             if int(item['Durability']) <=0: #if durability is fully used then item is destoyed
                 print(f'{item['name']} destroyed')
                 inventory.remove(item)

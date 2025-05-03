@@ -88,7 +88,7 @@ class WanderingTrader:
                         {"name" : "Hades Breath", "type" : "potion", "Durability" : 1}, #3
                         {"name" : "Hades Staff", "type" : "weapon", "power" : 200, "Durability" : 1000}, #4
                         {"name" : "Jousting Rod", "type" : "weapon", "power" : 25, "Durability" : 25}, #5
-                        {"name" : "Wooden Sword", "type" : "weapon", "power" : 5, "Durability" : 15}, #6
+                        {"name" : "Wooden Sword", "type" : "weapon", "power" : 15, "Durability" : 15}, #6
                         {"name" : "Plasma Rifle", "type" : "weapon", "power" : 250, "Durability" : 200}, #7
                         {"name" : "Sun Sword", "type" : "weapon", "power" : 130, "Durability" : 30}] #8
         #gets random number with 100 possibilties
