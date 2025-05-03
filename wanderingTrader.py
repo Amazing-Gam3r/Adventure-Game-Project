@@ -90,7 +90,7 @@ class WanderingTrader:
                         {"name" : "Jousting Rod", "type" : "weapon", "power" : 25, "Durability" : 25}, #5
                         {"name" : "Wooden Sword", "type" : "weapon", "power" : 15, "Durability" : 15}, #6
                         {"name" : "Plasma Rifle", "type" : "weapon", "power" : 250, "Durability" : 200}, #7
-                        {"name" : "Sun Sword", "type" : "weapon", "power" : 130, "Durability" : 30}] #8
+                        {"name" : "Moon Sword", "type" : "weapon", "power" : 130, "Durability" : 30}] #8
         #gets random number with 100 possibilties
         chance_num = random.randint(0,100)
         # 60% chance of no trade avaliable

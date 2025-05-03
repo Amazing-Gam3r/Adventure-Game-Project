@@ -98,8 +98,8 @@ class WanderingMonster:
             'name': 'Ice Dragon',
             'description':
                 'A powerful Ice dragon capable of much damage, but also much repair. Its Icy Breath is dangerous',
-            'health': '300',
-            'power': '450',
+            'health': '320',
+            'power': '150',
             'money': '125',
             'color': [153, 255, 255],
             'image': 'ice_dragon'}
@@ -107,9 +107,9 @@ class WanderingMonster:
             'name': 'Fire Dragon',
             'description':
                 "A deadly fire dragon. It's fire blasts bring death and destruction anywhere you go.",
-            'health': '300',
-            'power': '300',
-            'money': '125',
+            'health': '400',
+            'power': '350',
+            'money': '200',
             'color': [174, 75, 15],
             'image': 'fire_dragon'}
         monster_three = {
@@ -137,7 +137,7 @@ class WanderingMonster:
             'description':
                 'An orc is a creature little is understood about though '
                 'their attacks are random they tend to prefer biting off their foes ankles',
-            'health': '40',
+            'health': '60',
             'power': '130',
             'money': '15',
             'color': [220, 220, 220],
