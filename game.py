@@ -15,7 +15,8 @@ Establishes initial player stats prior to running the main game loop.
 import gamefunctions
 
 #Calls gamestart function which either creates a new set of base values or pulls them from a save file
-player_hp, player_gold, player_inventory, town_x, town_y, play_game, monster1, monster2 = gamefunctions.gamestart()
+(player_hp, player_gold, player_inventory, town_x, town_y,
+ play_game, monster1, monster2, tradeNPC) = gamefunctions.gamestart()
 
 #Main Game Loop
 while play_game:
@@ -23,9 +24,9 @@ while play_game:
     # If player move is one then the player is sent to the map (If map is closed abruptly then the game loop shuts off)
     if move == 1:
         (player_hp, player_gold, player_inventory,
-         play_game, monster1, monster2) = gamefunctions.mapUsage(player_hp, player_gold,
+         play_game, monster1, monster2, tradeNPC) = gamefunctions.mapUsage(player_hp, player_gold,
                                                                  player_inventory, town_x, town_y,
-                                                                 town_x, town_y, monster1, monster2)
+                                                                 town_x, town_y, monster1, monster2, tradeNPC)
     elif move == 2: # If player move is two then they sleep and gain health
         print('You Slept')
         player_hp = 250

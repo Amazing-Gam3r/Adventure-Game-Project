@@ -36,6 +36,8 @@ import os #allows for system data retrivial
 import json #allows for saving and laoding of json files
 import pygame_system #operates pygame to create a map
 import wanderingMonster #moves and generates monsters for the player to fight
+import wanderingTrader #generates and trades with a Wandering NPC
+import time #allows for time pause
 
 #Starts game with base needed data
 def gamestart():
@@ -51,6 +53,7 @@ def gamestart():
         play_game (bool): if game loop wil run after gamestart complete
         monster1 (class object): a monster the player can fight.
         monster2 (class object): a second monster the player can fight.
+        trader (class object): a trader the player can shop at.
         
     Examples:
         >>print(gamestart())
@@ -66,7 +69,7 @@ def gamestart():
         Enter Player Name:
         >>Tucker
            Hello, Tucker!   
-        (172.0, 12, [])
+        (172.0, 12, [], 0, 0, True, monster1, montser2, trader)
     """
     print('Welcome to an Adventure Game!') #Prints game title welcome 
     #Prints and collect menu choice
@@ -103,7 +106,10 @@ def gamestart():
 
     #establishs monster locations
     monster1, monster2 = wanderingMonster.monster_creation(town_x, town_y)
-    return hp, gold, inventory, town_x, town_y, play_game, monster1, monster2
+    #establishes wandering trader NPC
+    trader = wanderingTrader.WanderingTrader(town_x, town_y)
+    trader.create_trader()
+    return hp, gold, inventory, town_x, town_y, play_game, monster1, monster2, trader
 
 #Loads player stats from save file
 def loadgame_start():
@@ -183,7 +189,7 @@ def gamesave(hp, gold, inv, town_x, town_y):
     print(f'Final Health was: {hp}.\nFinal Gold was: {final_gold(int(gold))}.')
 
 #Creates and utilizes game map    
-def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, monster2):
+def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, monster2, trader):
     """
     Creates map using pygame_system module.
     
@@ -197,6 +203,7 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, 
         player_y (int): y coordinate of player.
         monster1 (class object): a monster the player can fight.
         monster2 (class object): a second monster the player can fight.
+        trader (class object): a trader the player can shop at.
     
     Returns:
         hp (float): player health.
@@ -204,13 +211,15 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, 
         play_game (bool): whether game will continue
         monster1 (class object): a monster the player can fight (with updated information).
         monster2 (class object): a second monster the player can fight (with updated information).
+        trader (class object): a trader the player can shop at.
      
     Examples:
-        >>mapUsage(120, 14, [], 92, 128, 32, 32)
+        >>mapUsage(120, 14, [], 92, 128, 32, 32, monster1, monster2, trader)
     """
     #Creates pygame screen and map   
     (player_x, player_y, town_yes,
-     monster_yes, monster_1, monster_2) = pygame_system.make_map(town_x, town_y, player_x, player_y, monster1, monster2)
+     monster_yes, monster_1, monster_2, trade_yes) = pygame_system.make_map(town_x, town_y, player_x,
+                                                                            player_y, monster1, monster2, trader)
     play_game = True
     if town_yes: #If player ended map on the town
         pass
@@ -224,25 +233,34 @@ def mapUsage(hp, gold, inventory, town_x, town_y, player_x, player_y, monster1, 
             if monster_death: #If the monster dies then its stats are updated and the monster is removed from the map
                 monster2.death()
         #reenters map
-        hp, gold, inventory, play_game, monster1, monster2 = mapUsage(hp, gold, inventory, town_x,
-                                                                      town_y, player_x, player_y, monster1, monster2)
+        hp, gold, inventory, play_game, monster1, monster2, trade_yes = mapUsage(hp, gold, inventory, town_x,
+                                                                                town_y, player_x, player_y,
+                                                                                 monster1, monster2, trader)
+    elif trade_yes:
+        inventory, gold = trader.trader_purchase(inventory, gold)
+        time.sleep(1)  # Time delay
+        # reenters map
+        hp, gold, inventory, play_game, monster1, monster2, trade_yes = mapUsage(hp, gold, inventory, town_x,
+                                                                                 town_y, player_x, player_y, monster1,
+                                                                                 monster2, trader)
     else: #If player force quit map
         play_game = False
 
-    #If both monsters are dead then once the player returns to the map there will be new monsters
-    monster1, monster2 = monster_death_check(monster1, monster2, town_x, town_y)
-    return hp, gold, inventory, play_game, monster1, monster2
+    #If both monsters are dead then once the player returns to the map there will be new monsters also resets trader
+    monster1, monster2 = monster_death_check(monster1, monster2, town_x, town_y, trader)
+    return hp, gold, inventory, play_game, monster1, monster2, trader
 
 #defines check function to ensure proper number of monsters
-def monster_death_check(monster1, monster2, town_x, town_y):
+def monster_death_check(monster1, monster2, town_x, town_y, trader):
     """
-    Checks to see if both monsters are dead and if they are generates new monsters.
+    Checks to see if both monsters are dead and if they are generates new monsters and resets trader.
 
     Parameters:
         monster1 (class object): a monster the player can fight.
         monster2 (class object): a second monster the player can fight.
         town_x (int): x coordinate of town.
         town_y (int): y coordinate of town.
+        trader (class object): a trader the player can shop at.
 
     Returns:
         monster1 (class object): a monster the player can fight.
@@ -254,6 +272,7 @@ def monster_death_check(monster1, monster2, town_x, town_y):
     """
     if monster1.alive == False and monster2.alive == False:
         monster1, monster2 = wanderingMonster.monster_creation(town_x, town_y)
+        trader.monsters_killed()
     return monster1, monster2
 
 #Defines purchase_item function

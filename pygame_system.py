@@ -18,7 +18,9 @@ Combined these functions and classes can be used to produce an interactive map f
 #Imports needed modules for code function
 import pygame #Drawing and Screen functions
 import time #Allows time dealy to be used in programming
+#Allows for doctests
 import wanderingMonster
+import wanderingTrader
 
 #Player class for player operations
 class Player:
@@ -180,9 +182,28 @@ class MapCreate:
             pygame.draw.circle(surface, (0, 0, 0), (monster_x, monster_y), monster_radius + self.border_size)
             #draws monster circle
             pygame.draw.circle(surface, monster_color, (monster_x, monster_y), monster_radius)
+    def drawtrader(self, trader, surface):
+        """
+        Draws The Trader NPC onto the Map.
+
+        Parameters:
+             trader (class object): the trader being drawn.
+             surface: surface the trader will be drawn on
+
+        Examples:
+            >>drawtrader(trader, screen)
+        """
+
+        try: #creates trader image
+            trader_icon = pygame.image.load(trader.image)
+            surface.blit(trader_icon, (trader.x, trader.y))
+        except: # Generates brown rectangle if image can't be found
+            trader = pygame.Rect(trader.x, trader.y, 32, 32)
+            # draws trader rectangle
+            pygame.draw.rect(surface,(150, 75, 0) , trader)
 
 #Function running pygame screen
-def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
+def make_map(town_x, town_y, start_x, start_y, monster1, monster2, trader):
     """
     Creates a pygame screen depicting a player map.
     
@@ -193,6 +214,7 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
         start_y (int): Y coordinate of where the player currently is.
         monster1 (class object): a monster that the player can fight.
         monster2 (class object): a monster that the player can fight.
+        trader (class object): a trader that the player can purchase goods from.
     
     Returns:
         player_x (int): ending x coordinate of player.
@@ -201,10 +223,11 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
         monster_menu (bool): Status of: if player exited map to monster fight.
         monster_1 (bool): Status of: if player exited map to fight monster 1.
         monster_2 (bool): Status of: if player exited map to fight monster 2.
+        trader_menu (bool): Status of: if player exited map to trader.
     
     Examples:
-        >>print(make_map(32, 32, 32, 32))
-        (32, 32, True, False, False, False)
+        >>print(make_map(32, 32, 32, 32, monster1, monster2, trader))
+        (32, 32, True, False, False, False, False)
     """
     #Starts pygame instance
     pygame.init()
@@ -220,6 +243,7 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
     running = True #Sets map run to True
     town_menu = False #Sets output of landed on town to false
     monster_menu = False #Sets output of landed on monster to false
+    trader_menu = False #sets output of landed on trader to false
     first_move_done = False #Establishes that first movement on map has not been completed
     monster_1 = False
     monster_2 = False
@@ -233,16 +257,20 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
                 running = False #Stops map loop
                 town_menu = True #Sets output of landed on town to True
             #When player on Monster space
-            elif (player1.player_x == monster1.monster_x) and (player1.player_y == monster1.monster_y):
+            elif (player1.player_x == monster1.monster_x) and (player1.player_y == monster1.monster_y) and monster1.alive == True:
                 running = False #Stops map loop
                 monster_menu = True #Sets output of landed on monster to True
                 monster_1 = True
-                monster_2 = False
-            elif (player1.player_x == monster2.monster_x) and (player1.player_y == monster2.monster_y):
+            elif (player1.player_x == monster2.monster_x) and (player1.player_y == monster2.monster_y) and monster2.alive == True:
                 running = False  # Stops map loop
                 monster_menu = True  # Sets output of landed on monster to True
-                monster_1 = False
                 monster_2 = True
+            #Player can enter wandering trader only when monsters are dead and trader hasn't been interacted with
+            elif (monster1.alive == False and monster2.alive == False and trader.traded == False):
+                if player1.player_x == trader.x and player1.player_y == trader.y:
+                    running = False
+                    trader_menu = True
+
         
         #fills screen white
         screen.fill([255,255,255])
@@ -255,6 +283,9 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
             map1.drawmonster(monster1, screen)
         if monster2.alive:
             map1.drawmonster(monster2, screen)
+        #When both monsters are dead and the trader has not been interacted with then it appears on the map.
+        if monster2.alive == False and monster1.alive == False and trader.traded == False:
+            map1.drawtrader(trader, screen)
         #draws player
         player1.draw_player(screen)
         
@@ -297,7 +328,7 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2):
         time.sleep(.01) #Time delay 
     #ends pygame instance
     pygame.quit()
-    return player1.player_x, player1.player_y, town_menu, monster_menu, monster_1, monster_2
+    return player1.player_x, player1.player_y, town_menu, monster_menu, monster_1, monster_2, trader_menu
 
 #Map test setup
 if __name__ == "__main__":
@@ -305,8 +336,14 @@ if __name__ == "__main__":
     town_y = 0
     monster1 = wanderingMonster.WanderingMonster(town_x, town_y)
     monster2 = wanderingMonster.WanderingMonster(town_x, town_y)
+    trader = wanderingTrader.WanderingTrader(town_x, town_y)
+    trader.create_trader()
     monster1.monster_x = 64
     monster2.monster_x = 128
-    print(make_map(32, 32, 32, 32, monster1, monster2))
+    print(make_map(32, 32, 32, 32, monster1, monster2, trader))
     print(monster1.monster['name'])
     print(monster2.monster['name'])
+    #Tests trader appearance
+    monster1.alive = False
+    monster2.alive = False
+    print(make_map(32, 32, 32, 32, monster1, monster2, trader))

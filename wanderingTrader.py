@@ -12,7 +12,7 @@ This class allows for interaction and generation of a Trading NPC.
 #This module generates a trading NPC
 
 import random #used for random trade avaliabilties
-from gamefunctions import print_shop_menu, validate_answer4, gold_check #used to create shop table and check inputs.
+import gamefunctions #used to create shop table and check inputs.
 
 class WanderingTrader:
     """WanderingTrader class to generate and trade with a Trader NPC.
@@ -33,7 +33,8 @@ class WanderingTrader:
             """
 
     def __init__(self, town_x, town_y):
-        """Defines intial charecteristics of WanderingTrader class.
+        """
+        Defines intial charecteristics of WanderingTrader class.
 
         Parameters:
             town_x (int): x coordinate of the town in the class instance.
@@ -52,7 +53,8 @@ class WanderingTrader:
         self.traded = False #NPC has not been interacted with as default
 
     def create_trader(self):
-        """Randomly chooses location for the wandering trader NPC.
+        """
+        Randomly chooses location for the wandering trader NPC.
 
         Examples:
             >>WanderingTrader.create_trader()
@@ -66,7 +68,8 @@ class WanderingTrader:
             self.y = random.randint(0, 9) * 32
 
     def trader_shop(self):
-        """Randomly selects trade options for the Trader NPC.
+        """
+        Randomly selects trade options for the Trader NPC.
 
         Returns:
             trades (bool): whether a trade is possible.
@@ -98,19 +101,19 @@ class WanderingTrader:
         else: # 40% trade is avaliable
             trades = True
             if 61 <= chance_num <= 90: # 30% bad trade possiblties
-                print_shop_menu(special_items[3]['name'], 30,
+                gamefunctions.print_shop_menu(special_items[3]['name'], 30,
                                               special_items[5]['name'], 25,
                                               special_items[1]['name'], 45,
                                               "Exit", 0)
                 items = [[special_items[3], 30], [special_items[5], 25], [special_items[1], 45]]
             elif 91 <= chance_num < 100: # 9% decent trade possibilties
-                print_shop_menu(special_items[6]['name'], 15,
+                gamefunctions.print_shop_menu(special_items[6]['name'], 15,
                                               special_items[8]['name'], 60,
                                               special_items[0]['name'], 110,
                                               "Exit", 0)
                 items = [[special_items[6], 15], [special_items[8], 60], [special_items[0], 110]]
             elif chance_num == 100: # 1% chance great trade possibilties
-                print_shop_menu(special_items[2]['name'], 160,
+                gamefunctions.print_shop_menu(special_items[2]['name'], 160,
                                               special_items[4]['name'], 300,
                                               special_items[7]['name'], 300,
                                               "Exit", 0)
@@ -118,7 +121,8 @@ class WanderingTrader:
         return trades, items
 
     def trader_purchase(self, invt, gold):
-        """Allows player to purchase an item from the wandering trader NPC.
+        """
+        Allows player to purchase an item from the wandering trader NPC.
 
         Parameters:
             invt (list): the list of items the player has in their inventory.
@@ -151,7 +155,7 @@ class WanderingTrader:
             #gets purchase choice from user
             purchase_choice = input('Item #> ')
             #validates users input
-            purchase_choice = validate_answer4(purchase_choice)
+            purchase_choice = gamefunctions.validate_answer4(purchase_choice)
             if purchase_choice == 4: #Player chose to exit shop
                 print('You may regret giving up this opportunity.')
                 print('Leaving Trader')
@@ -159,7 +163,7 @@ class WanderingTrader:
                 if available_items[purchase_choice - 1][0] in invt:  # Checks to see if player already has item
                     print('Item already in inventory')
                 else: # purchases item (removes gold from balance and adds item to inventory)
-                    if gold_check(gold, available_items[0][1]):  # ensures sufficent gold
+                    if gamefunctions.gold_check(gold, available_items[0][1]):  # ensures sufficent gold
                         print(f'You have purchased {available_items[purchase_choice - 1][0]['name']} for '
                               f'{available_items[purchase_choice - 1][1]} gold.\n')
                         gold -= available_items[purchase_choice - 1][1]
@@ -170,7 +174,8 @@ class WanderingTrader:
         return invt, gold
 
     def monsters_killed(self):
-        """Updates trader status based on if monsters have been killed.
+        """
+        Updates trader status based on if monsters have been killed.
 
         Examples:
             >>WanderingTrader.monsters_killed()

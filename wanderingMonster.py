@@ -17,7 +17,8 @@ Combined these functions and classes produce fightable monsters.
 import random #used for genertaing random positions on a map
 
 class WanderingMonster:
-    """WanderingMonster class to generate and move fightable monsters.
+    """
+    WanderingMonster class to generate and move fightable monsters.
 
     Instance Objects:
         monster_x (int): x coordinate of the monster in the class instance.
@@ -38,7 +39,8 @@ class WanderingMonster:
 
     # Defines random monster function
     def __init__(self, town_x, town_y):
-        """Intializes WanderingMonster class.
+        """
+        Intializes WanderingMonster class.
 
         Parameters:
             town_x (int): x coordinate of the town in the class instance.
@@ -60,7 +62,8 @@ class WanderingMonster:
         self.player_moves = 0
 
     def __str__(self):
-        """Formats string output when instnace is printed.
+        """
+        Formats string output when instnace is printed.
 
         Example:
             >>monster_test = WanderingMonster(64, 128)
@@ -154,7 +157,8 @@ class WanderingMonster:
         return monster_list[monster_number]
 
     def move(self):
-        """Moves monster around the map every other time the player moves.
+        """
+        Moves monster around the map every other time the player moves.
 
         Follows pattern that eventually ends with monsters circling map border
 
@@ -190,7 +194,8 @@ class WanderingMonster:
                         self.monster_y += 32
 
     def death(self):
-        """Updates monsters alive status to dead and move monster off map.
+        """
+        Updates monsters alive status to dead and move monster off map.
 
         Example:
             >>my_monster = WanderingMonster(128, 256)
@@ -206,7 +211,8 @@ class WanderingMonster:
         self.monster_y = 500
 
 def monster_creation(town_x, town_y):
-    """ creates monsters using wanderingMonster class.
+    """
+    Creates monsters using wanderingMonster class.
 
     Parameters:
         town_x (int): x coordinate of town.
