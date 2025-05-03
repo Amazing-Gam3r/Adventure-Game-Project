@@ -1,14 +1,14 @@
 """Contains the functions needed to launch and operate a map screen.
 
- This module contains the function:
+This module contains the function:
     make_map(town_x, town_y, start_x, start_y):
  
- This module also contains the classes:
+This module also contains the classes:
     Player(start_x, start_y): used for items involving the player in the map
     MapCreate: used to create map objects
  
- Combined these functions and classes can be used to produce an interactive map for an adventure game.
- """
+Combined these functions and classes can be used to produce an interactive map for an adventure game.
+"""
 
 #pygame_system.py
 #Tucker Werhane

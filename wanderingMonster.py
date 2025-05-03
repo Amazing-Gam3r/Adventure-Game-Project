@@ -3,10 +3,10 @@
 This module contains the function:
     monster_creation(town_x, town_y):
 
- This module also contains the classes:
+This module also contains the classes:
     WanderingMonster(town_x, town_y): used to generate and move fightable monsters.
 
- Combined these functions and classes produce fightable monsters.
+Combined these functions and classes produce fightable monsters.
 """
 
 #wanderingMonster.py

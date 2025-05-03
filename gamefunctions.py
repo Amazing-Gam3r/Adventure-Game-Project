@@ -22,7 +22,7 @@ validate_answer3(answer):
 gold_check(gold, gold_need):
 final_gold(gold):
 test_functions():
-these functions comprise what is required to create an adventure game.
+These functions comprise what is required to create an adventure game.
 """
 
 #gamefunctions.py
@@ -353,7 +353,8 @@ def item_shop(gold, inventory):
     sword = {"name" : "Star Sword", "type" : "weapon", "Durability" : 45}
     potion = {"name" : "Instant Kill Potion", "type" : "potion", "Durability" : 1}
     emoji = {"name" : "Smiley Emoji", "type" : "emoji", "Durability" : 10000}
-    print_shop_menu("Star Sword", 42, "Instant Kill Potion", 81, "Smiley Emoji", 2, "Exit" , 0)
+    print_shop_menu("Star Sword", 42, "Instant Kill Potion", 81,
+                    "Smiley Emoji", 2, "Exit" , 0)
     shopping = True
     while shopping: #Shopping loop
         choice = input('What would you like to buy?\n')
