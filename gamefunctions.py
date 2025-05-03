@@ -777,7 +777,7 @@ def fight_inventory(hp, monster_health, monster_power, inventory):
     print(invt)
     if invt: #if there is a usable item then a choice is made between items
         valid = False
-        while valid == False:
+        while not valid:
             try:
                 print('Choose item to use')
                 item_choice = input(f'{len(invt)} options:\n')
@@ -998,7 +998,7 @@ def test_functions():
     #test condition for mapUsage:
     print(mapUsage(120, 14, [], 92, 128, 32, 32,
                    wanderingMonster.WanderingMonster(32, 32),
-                   wanderingMonster.WanderingMonster(32, 32)))
+                   wanderingMonster.WanderingMonster(32, 32), trader))
 
 #Runs test_functions if module run directly    
 if __name__ == "__main__":

@@ -266,7 +266,7 @@ def make_map(town_x, town_y, start_x, start_y, monster1, monster2, trader):
                 monster_menu = True  # Sets output of landed on monster to True
                 monster_2 = True
             #Player can enter wandering trader only when monsters are dead and trader hasn't been interacted with
-            elif (monster1.alive == False and monster2.alive == False and trader.traded == False):
+            elif monster1.alive == False and monster2.alive == False and trader.traded == False:
                 if player1.player_x == trader.x and player1.player_y == trader.y:
                     running = False
                     trader_menu = True
