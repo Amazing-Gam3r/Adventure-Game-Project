@@ -537,7 +537,7 @@ def getUserFightOptions(user_hp, gold, monster_hp, monster_name):
         (Current Gold: 17) 
         How would you like to continue?
         1) Primary Attack (5-37 damage)
-        2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)
+        2) Shield Potion (Costs 25 Gold, Monster takes half of attack damage)
         3) Use Inventory item
         4) Leave fight (Lose 1 Gold)
         >>>1
@@ -547,7 +547,7 @@ def getUserFightOptions(user_hp, gold, monster_hp, monster_name):
     print (f'(Current Gold: {gold}) \nHow would you like to continue?')
     #Determines players move choice for the fight
     user_choice = input('1) Primary Attack (5-37 damage)\n'
-                        '2) Shield Potion (Costs 5 Gold, Monster takes half of attack damage)\n'
+                        '2) Shield Potion (Costs 25 Gold, Monster takes half of attack damage)\n'
                         '3) Use Inventory Item\n'
                         '4) Leave fight (Lose 10 Gold)\n')
     #ensures sufficent funds for shield potion
@@ -708,8 +708,8 @@ def fight_attacks(fight_choice, hp, gold, monster_health, monster_power, invento
     #Shield
     elif fight_choice == 2:
         fight = True
-        gold -= 5
-        print('5 Gold spent on Shield Potion')
+        gold -= 25
+        print('25 Gold spent on Shield Potion')
         #reverses half of monsters damage
         monster_damage = random.randint(5, monster_power)
         damage = monster_damage /2
