@@ -27,7 +27,7 @@ These functions comprise what is required to create an adventure game.
 
 #gamefunctions.py
 #Tucker Werhane
-#April 30th, 2025
+#May 4th, 2025
 #This program holds all functions needed to run and play an adventure game.
 
 #Imports needed modules

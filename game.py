@@ -6,7 +6,7 @@ Establishes initial player stats prior to running the main game loop.
 
 #game.py
 #Tucker Werhane
-#April 30th, 2025
+#May 4th, 2025
 #This programs runs an adventure game that uses and creates save files
 #During the game the player can fight a variety of monsters and buy helpful items from the shop
 #The player can also catch a nap to regain health

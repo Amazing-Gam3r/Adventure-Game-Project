@@ -11,7 +11,7 @@ Combined these functions and classes produce fightable monsters.
 
 #wanderingMonster.py
 #Tucker Werhane
-#April 30th, 2025
+#May 4th, 2025
 #This module generates fightable monsters.
 
 import random #used for genertaing random positions on a map
@@ -24,9 +24,11 @@ class WanderingMonster:
         monster_y (int): y coordinate of the monster in the class instance.
         monster (dict): stats of monster generated for class instance.
         monster_color (color): the color of the monster in the class instance.
+        moncter_image (str): the path to the image of the monster.
         town_x (int): x coordinate of the town in the class instance.
         town_y (int): y coordinate of the town in the class instance.
         alive (bool): if the monster is alive or not.
+        player_moves (int): the number of moves the player has made on the map.
 
     Methods:
         new_random_monster(): generates a new monster.
@@ -37,6 +39,10 @@ class WanderingMonster:
     # Defines random monster function
     def __init__(self, town_x, town_y):
         """Intializes WanderingMonster class.
+
+        Parameters:
+            town_x (int): x coordinate of the town in the class instance.
+            town_y (int): y coordinate of the town in the class instance.
 
         Example:
             >>my_monster = WanderingMonster(64, 128)
@@ -62,6 +68,7 @@ class WanderingMonster:
             Piglin at Color: [255, 215, 0] at location: (64, 128)"""
 
         return f'{self.monster['name']} at Color: {self.monster_color} at location: ({self.town_x}, {self.town_y})'
+
     def new_random_monster(self):
         """
         Generates Random monster along with its stats.
@@ -181,6 +188,7 @@ class WanderingMonster:
                         self.monster_x += 32
                     elif self.monster_y == self.town_y:
                         self.monster_y += 32
+
     def death(self):
         """Updates monsters alive status to dead and move monster off map.
 
