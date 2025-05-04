@@ -605,7 +605,7 @@ def monster_fight(hp, gold, inventory, monster):
     while fight:
         #Death of monster or player
         if hp <= 0 or monster_health <= 0:
-            hp, gold, monster_death = fight_death(hp, gold, monster_health, monster.monster['money'])
+            hp, gold, monster_death, inventory = fight_death(hp, gold, monster_health, monster.monster['money'],inventory)
             fight = False
         #Player and Monster have Sufficient HP
         else:
@@ -616,7 +616,7 @@ def monster_fight(hp, gold, inventory, monster):
     return hp, gold, inventory, monster, monster_death
 
 #Function controlling death during a monster fight
-def fight_death(hp, gold, monster_hp, monster_gold):
+def fight_death(hp, gold, monster_hp, monster_gold, invt):
     """
     Protocols for death during a monster fight.
     
@@ -625,6 +625,7 @@ def fight_death(hp, gold, monster_hp, monster_gold):
         gold (int): Current gold balance of player.
         monster_hp (float): current health of monster.
         monster_gold (int): gold of monster being fought
+        invt (list): current inventory held by player.
     
     Returns:
         hp (float): health of player
@@ -647,9 +648,10 @@ def fight_death(hp, gold, monster_hp, monster_gold):
     #Death of player
     if hp <= 0:
         #resets player health and gold
-        print('You died! \nResetting Health and Gold\n')
+        print('You died! \nResetting Health, Gold and Inventory\n')
         hp = 150
         gold = 50
+        invt = []
         monster_death = False #player died therfore monster didn't die
         
     #Death of Monster
@@ -662,7 +664,7 @@ def fight_death(hp, gold, monster_hp, monster_gold):
         gold += win_gold
         hp += 25
         monster_death = True #player killed the monster
-    return hp, gold, monster_death
+    return hp, gold, monster_death, invt
 
 #Function controlling attacks during monster fight
 def fight_attacks(fight_choice, hp, gold, monster_health, monster_power, inventory):
@@ -974,8 +976,8 @@ def test_functions():
     print(final_gold(-7))
     
     #Test conditions for fight_death:
-    print(fight_death(0, 15, 25, 26))
-    print(fight_death(25, 16, 0, 27))
+    print(fight_death(0, 15, 25, 26, []))
+    print(fight_death(25, 16, 0, 27, []))
     
     #Test conditions for fight_attacks:
     print(fight_attacks(1, 117, 25, 112, 17, []))
